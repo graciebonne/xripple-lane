@@ -5,10 +5,12 @@ import HowItWorks from "@/components/landing/HowItWorks";
 import SupportedChains from "@/components/landing/SupportedChains";
 import CTA from "@/components/landing/CTA";
 import Footer from "@/components/landing/Footer";
+import BonusBanner from "@/components/promotional/BonusBanner";
 
 const Index = () => {
   return (
     <div className="min-h-screen">
+      <BonusBanner trigger="session" />
       <Header />
       <main>
         <Hero />

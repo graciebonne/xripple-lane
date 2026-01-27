@@ -12,11 +12,11 @@ serve(async (req) => {
   }
 
   try {
-    console.log('Fetching XRP price from CoinGecko...');
+    console.log('Fetching crypto prices from CoinGecko...');
     
-    // Fetch XRP price from CoinGecko API
+    // Fetch prices from CoinGecko API
     const response = await fetch(
-      'https://api.coingecko.com/api/v3/simple/price?ids=ripple,bitcoin,ethereum,solana,tron,binancecoin,matic-network&vs_currencies=usd&include_24hr_change=true&include_24hr_vol=true&include_market_cap=true',
+      'https://api.coingecko.com/api/v3/simple/price?ids=ripple,bitcoin,ethereum,solana,tron,binancecoin,matic-network,tether,usd-coin,binance-usd&vs_currencies=usd&include_24hr_change=true&include_24hr_vol=true&include_market_cap=true',
       {
         headers: {
           'Accept': 'application/json',
@@ -31,7 +31,7 @@ serve(async (req) => {
     const data = await response.json();
     console.log('CoinGecko response:', data);
 
-    // Format the response
+    // Format the response with all coins including stablecoins
     const prices = {
       xrp: {
         usd: data.ripple?.usd || 0.52,
@@ -63,6 +63,19 @@ serve(async (req) => {
         usd: data['matic-network']?.usd || 0.85,
         usd_24h_change: data['matic-network']?.usd_24h_change || 0,
       },
+      // Stablecoins
+      usdt: {
+        usd: data.tether?.usd || 1.00,
+        usd_24h_change: data.tether?.usd_24h_change || 0,
+      },
+      usdc: {
+        usd: data['usd-coin']?.usd || 1.00,
+        usd_24h_change: data['usd-coin']?.usd_24h_change || 0,
+      },
+      busd: {
+        usd: data['binance-usd']?.usd || 1.00,
+        usd_24h_change: data['binance-usd']?.usd_24h_change || 0,
+      },
       timestamp: Date.now(),
     };
 
@@ -81,6 +94,9 @@ serve(async (req) => {
       trx: { usd: 0.12, usd_24h_change: 0 },
       bnb: { usd: 580, usd_24h_change: 0 },
       matic: { usd: 0.85, usd_24h_change: 0 },
+      usdt: { usd: 1.00, usd_24h_change: 0 },
+      usdc: { usd: 1.00, usd_24h_change: 0 },
+      busd: { usd: 1.00, usd_24h_change: 0 },
       timestamp: Date.now(),
       fallback: true,
     };

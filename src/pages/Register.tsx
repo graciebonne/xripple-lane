@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import BonusBanner from "@/components/promotional/BonusBanner";
 
 const Register = () => {
   const [fullName, setFullName] = useState("");
@@ -16,6 +17,7 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showBanner, setShowBanner] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -81,7 +83,8 @@ const Register = () => {
           title: "Account created!",
           description: "Welcome to XRPVault. You can now access your dashboard.",
         });
-        navigate("/dashboard");
+        setShowBanner(true);
+        setTimeout(() => navigate("/dashboard"), 100);
       }
     } catch (error) {
       toast({
@@ -96,6 +99,7 @@ const Register = () => {
 
   return (
     <div className="min-h-screen hero-gradient flex items-center justify-center p-4 relative overflow-hidden">
+      {showBanner && <BonusBanner trigger="auth" />}
       {/* Background Effects */}
       <div className="hero-orb hero-orb-1" />
       <div className="hero-orb hero-orb-2" />

@@ -11,11 +11,14 @@ import {
   Settings, 
   LogOut,
   Menu,
-  X
+  Moon,
+  Sun
 } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useTheme } from "next-themes";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
+import { useKYC } from "@/hooks/useKYC";
 
 const navItems = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -30,6 +33,8 @@ const navItems = [
 const DashboardLayout = ({ children }: { children: ReactNode }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const { theme, setTheme } = useTheme();
+  const { kycData } = useKYC();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -106,7 +111,33 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
               <Menu className="w-6 h-6" />
             </button>
             <div className="flex items-center gap-4 ml-auto">
-              <div className="badge-warning">KYC Pending</div>
+              {/* Theme Toggle */}
+              <button
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                className="p-2 rounded-lg hover:bg-muted transition-colors"
+              >
+                {theme === 'dark' ? (
+                  <Sun className="w-5 h-5 text-muted-foreground" />
+                ) : (
+                  <Moon className="w-5 h-5 text-muted-foreground" />
+                )}
+              </button>
+              
+              {/* KYC Status Badge */}
+              {kycData && (
+                <div className={
+                  kycData.status === 'approved' 
+                    ? 'badge-success' 
+                    : kycData.status === 'rejected'
+                    ? 'badge-error'
+                    : kycData.status === 'pending'
+                    ? 'badge-warning'
+                    : 'badge-info'
+                }>
+                  KYC {kycData.status === 'not_started' ? 'Not Started' : kycData.status.charAt(0).toUpperCase() + kycData.status.slice(1)}
+                </div>
+              )}
+              
               <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold">
                 {user?.email?.charAt(0).toUpperCase() || "U"}
               </div>
