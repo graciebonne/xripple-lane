@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTheme } from 'next-themes';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -11,7 +12,8 @@ import {
   Moon,
   Sun,
   Globe,
-  LogOut
+  LogOut,
+  Monitor
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
@@ -19,13 +21,13 @@ import { useNavigate } from 'react-router-dom';
 export default function Settings() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const { theme, setTheme } = useTheme();
   const [notifications, setNotifications] = useState({
     email: true,
     push: false,
     trades: true,
     marketing: false,
   });
-  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
 
   const handleSignOut = async () => {
     await signOut();
@@ -130,31 +132,44 @@ export default function Settings() {
             <h2 className="text-lg font-semibold text-foreground">Appearance</h2>
           </div>
           
-          <div className="flex gap-4">
+          <div className="grid grid-cols-3 gap-3">
             <button
               onClick={() => setTheme('light')}
-              className={`flex-1 p-4 rounded-xl border transition-all flex flex-col items-center gap-2 ${
+              className={`p-4 rounded-xl border transition-all flex flex-col items-center gap-2 ${
                 theme === 'light'
                   ? 'border-primary bg-primary/5'
                   : 'border-border hover:border-primary/50'
               }`}
             >
               <Sun className={`w-6 h-6 ${theme === 'light' ? 'text-primary' : 'text-muted-foreground'}`} />
-              <span className={`font-medium ${theme === 'light' ? 'text-primary' : 'text-muted-foreground'}`}>
+              <span className={`text-sm font-medium ${theme === 'light' ? 'text-primary' : 'text-muted-foreground'}`}>
                 Light
               </span>
             </button>
             <button
               onClick={() => setTheme('dark')}
-              className={`flex-1 p-4 rounded-xl border transition-all flex flex-col items-center gap-2 ${
+              className={`p-4 rounded-xl border transition-all flex flex-col items-center gap-2 ${
                 theme === 'dark'
                   ? 'border-primary bg-primary/5'
                   : 'border-border hover:border-primary/50'
               }`}
             >
               <Moon className={`w-6 h-6 ${theme === 'dark' ? 'text-primary' : 'text-muted-foreground'}`} />
-              <span className={`font-medium ${theme === 'dark' ? 'text-primary' : 'text-muted-foreground'}`}>
+              <span className={`text-sm font-medium ${theme === 'dark' ? 'text-primary' : 'text-muted-foreground'}`}>
                 Dark
+              </span>
+            </button>
+            <button
+              onClick={() => setTheme('system')}
+              className={`p-4 rounded-xl border transition-all flex flex-col items-center gap-2 ${
+                theme === 'system'
+                  ? 'border-primary bg-primary/5'
+                  : 'border-border hover:border-primary/50'
+              }`}
+            >
+              <Monitor className={`w-6 h-6 ${theme === 'system' ? 'text-primary' : 'text-muted-foreground'}`} />
+              <span className={`text-sm font-medium ${theme === 'system' ? 'text-primary' : 'text-muted-foreground'}`}>
+                System
               </span>
             </button>
           </div>

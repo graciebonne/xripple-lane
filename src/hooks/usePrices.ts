@@ -16,6 +16,9 @@ interface Prices {
   trx: PriceData;
   bnb: PriceData;
   matic: PriceData;
+  usdt: PriceData;
+  usdc: PriceData;
+  busd: PriceData;
   timestamp: number;
   fallback?: boolean;
 }
@@ -28,6 +31,9 @@ const defaultPrices: Prices = {
   trx: { usd: 0.12, usd_24h_change: 0 },
   bnb: { usd: 580, usd_24h_change: 0 },
   matic: { usd: 0.85, usd_24h_change: 0 },
+  usdt: { usd: 1.00, usd_24h_change: 0 },
+  usdc: { usd: 1.00, usd_24h_change: 0 },
+  busd: { usd: 1.00, usd_24h_change: 0 },
   timestamp: Date.now(),
 };
 
