@@ -3,13 +3,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { motion } from 'framer-motion';
-import { User, Calendar, Phone, Lock, Eye, EyeOff } from 'lucide-react';
+import { User, Calendar, Phone } from 'lucide-react';
 
 export interface PersonalInfoData {
   firstName: string;
   lastName: string;
   dateOfBirth: string;
-  ssn: string;
   phoneNumber: string;
 }
 
@@ -23,29 +22,15 @@ export function PersonalInfoForm({ onSubmit, initialData }: PersonalInfoFormProp
     firstName: '',
     lastName: '',
     dateOfBirth: '',
-    ssn: '',
     phoneNumber: '',
   });
-  const [showSSN, setShowSSN] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-
-  const formatSSN = (value: string) => {
-    const digits = value.replace(/\D/g, '').slice(0, 9);
-    if (digits.length <= 3) return digits;
-    if (digits.length <= 5) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
-    return `${digits.slice(0, 3)}-${digits.slice(3, 5)}-${digits.slice(5)}`;
-  };
 
   const formatPhone = (value: string) => {
     const digits = value.replace(/\D/g, '').slice(0, 10);
     if (digits.length <= 3) return digits;
     if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
     return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
-  };
-
-  const handleSSNChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formatted = formatSSN(e.target.value);
-    setData({ ...data, ssn: formatted });
   };
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,7 +44,6 @@ export function PersonalInfoForm({ onSubmit, initialData }: PersonalInfoFormProp
     if (!data.firstName.trim()) newErrors.firstName = 'First name is required';
     if (!data.lastName.trim()) newErrors.lastName = 'Last name is required';
     if (!data.dateOfBirth) newErrors.dateOfBirth = 'Date of birth is required';
-    if (data.ssn.replace(/\D/g, '').length !== 9) newErrors.ssn = 'Valid SSN is required';
     if (data.phoneNumber.replace(/\D/g, '').length !== 10) newErrors.phoneNumber = 'Valid phone number is required';
 
     // Age validation (must be 18+)
@@ -97,7 +81,7 @@ export function PersonalInfoForm({ onSubmit, initialData }: PersonalInfoFormProp
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="firstName">First Name</Label>
           <Input
@@ -142,36 +126,6 @@ export function PersonalInfoForm({ onSubmit, initialData }: PersonalInfoFormProp
         {errors.dateOfBirth && (
           <p className="text-xs text-destructive">{errors.dateOfBirth}</p>
         )}
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="ssn" className="flex items-center gap-2">
-          <Lock className="h-4 w-4" />
-          Social Security Number
-        </Label>
-        <div className="relative">
-          <Input
-            id="ssn"
-            type={showSSN ? 'text' : 'password'}
-            placeholder="XXX-XX-XXXX"
-            value={data.ssn}
-            onChange={handleSSNChange}
-            className={`pr-10 ${errors.ssn ? 'border-destructive' : ''}`}
-          />
-          <button
-            type="button"
-            onClick={() => setShowSSN(!showSSN)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-          >
-            {showSSN ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-          </button>
-        </div>
-        {errors.ssn && (
-          <p className="text-xs text-destructive">{errors.ssn}</p>
-        )}
-        <p className="text-xs text-muted-foreground">
-          Your SSN is encrypted and securely stored
-        </p>
       </div>
 
       <div className="space-y-2">
