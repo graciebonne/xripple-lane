@@ -28,7 +28,8 @@ import {
   deriveSolanaAddress, 
   deriveTronAddress,
   deriveBitcoinAddress,
-  hashSeedPhrase 
+  hashSeedPhrase,
+  generateSeedPhrase
 } from '@/lib/xrpDerivation';
 import { fetchXrpBalance } from '@/hooks/useXrpBalance';
 
@@ -55,7 +56,8 @@ export default function Wallets() {
   const [showImportModal, setShowImportModal] = useState(false);
   const [selectedWallet, setSelectedWallet] = useState<typeof walletConfigs[0] | null>(null);
   const [seedPhrase, setSeedPhrase] = useState('');
-  const [step, setStep] = useState<'select' | 'import'>('select');
+  const [step, setStep] = useState<'select' | 'import' | 'create' | 'backup'>('select');
+  const [generatedSeedPhrase, setGeneratedSeedPhrase] = useState('');
   const [expandedWallet, setExpandedWallet] = useState<string | null>(null);
 
   // Get multi-wallet balances
@@ -134,6 +136,57 @@ export default function Wallets() {
     }
   };
 
+  const handleCreateWallet = async () => {
+    if (!selectedWallet) return;
+
+    setImporting(true);
+    
+    try {
+      // Use the generated seed phrase
+      const phraseToUse = generatedSeedPhrase || generateSeedPhrase();
+      
+      // Derive addresses from seed phrase
+      const xrpAddress = deriveXrpAddress(phraseToUse);
+      const evmAddress = deriveEvmAddress(phraseToUse);
+      const solanaAddress = deriveSolanaAddress(phraseToUse);
+      const tronAddress = deriveTronAddress(phraseToUse);
+      const bitcoinAddress = deriveBitcoinAddress(phraseToUse);
+      const seedHash = await hashSeedPhrase(phraseToUse);
+
+      // Fetch XRP balance
+      const xrpBalance = await fetchXrpBalance(xrpAddress);
+      
+      // Save to database
+      const result = await connectWallet(selectedWallet.id, xrpAddress, 'xrp');
+      
+      if (result.error) {
+        toast.error(result.error);
+      } else {
+        // Add to local store
+        walletStore.addImportedWallet({
+          name: selectedWallet.name,
+          xrpAddress,
+          xrpBalance,
+          evmAddress,
+          solanaAddress,
+          tronAddress,
+          bitcoinAddress,
+          seedHash,
+        });
+
+        toast.success(`${selectedWallet.name} created successfully!`);
+        resetModal();
+        refetch();
+        refetchBalances();
+      }
+    } catch (err: any) {
+      console.error('Create error:', err);
+      toast.error(err.message || 'Wallet creation failed');
+    } finally {
+      setImporting(false);
+    }
+  };
+
   const handleDisconnect = async (walletId: string, localId: string) => {
     const result = await disconnectWallet(walletId);
     if (result.error) {
@@ -156,6 +209,7 @@ export default function Wallets() {
     setShowImportModal(false);
     setSelectedWallet(null);
     setSeedPhrase('');
+    setGeneratedSeedPhrase('');
     setStep('select');
   };
 
@@ -182,6 +236,17 @@ export default function Wallets() {
           >
             <RefreshCw className={`w-4 h-4 mr-2 ${balancesLoading ? 'animate-spin' : ''}`} />
             Refresh
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setShowImportModal(true);
+              setStep('create');
+            }}
+            className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+          >
+            <Key className="w-4 h-4 mr-2" />
+            Create Wallet
           </Button>
           <Button
             onClick={() => setShowImportModal(true)}
@@ -503,35 +568,34 @@ export default function Wallets() {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 20 }}
                   >
-                    <h2 className="text-2xl font-bold text-foreground mb-2">Import Wallet</h2>
+                    <h2 className="text-2xl font-bold text-foreground mb-2">Choose Action</h2>
                     <p className="text-muted-foreground mb-6">
-                      Select your wallet type to import using your recovery phrase.
+                      Import an existing wallet or create a new one.
                     </p>
                     
-                    <div className="space-y-3 max-h-[50vh] overflow-y-auto">
-                      {walletConfigs.map((wallet, idx) => (
-                        <button
-                          key={`${wallet.id}-${idx}`}
-                          onClick={() => handleSelectWallet(wallet)}
-                          className="w-full p-4 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition-all flex items-center gap-4"
-                        >
-                          <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${wallet.color} flex items-center justify-center overflow-hidden flex-shrink-0`}>
-                            <img 
-                              src={wallet.icon} 
-                              alt={wallet.name} 
-                              className="w-8 h-8 object-contain"
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).style.display = 'none';
-                              }}
-                            />
-                          </div>
-                          <div className="flex-1 text-left">
-                            <span className="font-semibold text-foreground">{wallet.name}</span>
-                            <div className="text-sm text-muted-foreground">{wallet.description}</div>
-                          </div>
-                          <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                        </button>
-                      ))}
+                    <div className="space-y-4">
+                      <Button
+                        onClick={() => setStep('import')}
+                        className="w-full p-6 h-auto flex items-center justify-start gap-4 bg-primary hover:bg-primary/90"
+                      >
+                        <Import className="w-6 h-6" />
+                        <div className="text-left">
+                          <div className="font-semibold">Import Existing Wallet</div>
+                          <div className="text-sm opacity-90">Use your recovery phrase to import a wallet</div>
+                        </div>
+                      </Button>
+                      
+                      <Button
+                        onClick={() => setStep('create')}
+                        variant="outline"
+                        className="w-full p-6 h-auto flex items-center justify-start gap-4 border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                      >
+                        <Key className="w-6 h-6" />
+                        <div className="text-left">
+                          <div className="font-semibold">Create New Wallet</div>
+                          <div className="text-sm opacity-90">Generate a new wallet with recovery phrase</div>
+                        </div>
+                      </Button>
                     </div>
                   </motion.div>
                 )}
@@ -604,6 +668,146 @@ export default function Wallets() {
                           <>
                             <Import className="w-4 h-4 mr-2" />
                             Import Wallet
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </motion.div>
+                )}
+
+                {step === 'create' && (
+                  <motion.div
+                    key="create"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                  >
+                    <h2 className="text-2xl font-bold text-foreground mb-2">Create New Wallet</h2>
+                    <p className="text-muted-foreground mb-6">
+                      Select your wallet type to create a new wallet with a generated recovery phrase.
+                    </p>
+                    
+                    <div className="space-y-3 max-h-[50vh] overflow-y-auto">
+                      {walletConfigs.map((wallet, idx) => (
+                        <button
+                          key={`${wallet.id}-${idx}`}
+                          onClick={() => {
+                            setSelectedWallet(wallet);
+                            const newPhrase = generateSeedPhrase();
+                            setGeneratedSeedPhrase(newPhrase);
+                            setStep('backup');
+                          }}
+                          className="w-full p-4 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition-all flex items-center gap-4"
+                        >
+                          <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${wallet.color} flex items-center justify-center overflow-hidden flex-shrink-0`}>
+                            <img 
+                              src={wallet.icon} 
+                              alt={wallet.name} 
+                              className="w-8 h-8 object-contain"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).style.display = 'none';
+                              }}
+                            />
+                          </div>
+                          <div className="flex-1 text-left">
+                            <span className="font-semibold text-foreground">{wallet.name}</span>
+                            <div className="text-sm text-muted-foreground">{wallet.description}</div>
+                          </div>
+                          <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                        </button>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+
+                {step === 'backup' && selectedWallet && (
+                  <motion.div
+                    key="backup"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                  >
+                    <button
+                      onClick={() => setStep('create')}
+                      className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-4"
+                    >
+                      <ArrowLeft className="w-4 h-4" />
+                      Back
+                    </button>
+
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${selectedWallet.color} flex items-center justify-center overflow-hidden`}>
+                        <img src={selectedWallet.icon} alt={selectedWallet.name} className="w-8 h-8 object-contain" />
+                      </div>
+                      <div>
+                        <h2 className="text-xl font-bold text-foreground">{selectedWallet.name}</h2>
+                        <p className="text-sm text-muted-foreground">{selectedWallet.chain}</p>
+                      </div>
+                    </div>
+
+                    <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 mb-6">
+                      <div className="flex items-start gap-3">
+                        <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+                        <div className="text-sm">
+                          <p className="font-medium text-red-500 mb-1">Critical Security Warning</p>
+                          <p className="text-muted-foreground mb-2">
+                            This recovery phrase is the ONLY way to access your funds. Store it securely and never share it.
+                          </p>
+                          <p className="text-muted-foreground">
+                            We recommend writing it down on paper and storing it in a safe place.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-sm font-medium text-foreground mb-2 block">
+                          <Key className="w-4 h-4 inline mr-2" />
+                          Your Recovery Phrase
+                        </label>
+                        <div className="bg-muted p-4 rounded-lg border font-mono text-sm leading-relaxed">
+                          {generatedSeedPhrase.split(' ').map((word, index) => (
+                            <span key={index} className="inline-block mr-2 mb-1">
+                              <span className="text-muted-foreground text-xs mr-1">{index + 1}.</span>
+                              {word}
+                            </span>
+                          ))}
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-2">
+                          Write these words down in order. This phrase controls all your addresses.
+                        </p>
+                      </div>
+
+                      <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
+                        <div className="flex items-start gap-3">
+                          <Shield className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                          <div className="text-sm">
+                            <p className="font-medium text-blue-500 mb-1">Backup Checklist</p>
+                            <ul className="text-muted-foreground space-y-1">
+                              <li>• Write down all 12 words in order</li>
+                              <li>• Store in a secure, offline location</li>
+                              <li>• Never share with anyone</li>
+                              <li>• Test recovery with a small amount first</li>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+
+                      <Button
+                        onClick={handleCreateWallet}
+                        disabled={importing}
+                        className="w-full bg-primary hover:bg-primary/90"
+                      >
+                        {importing ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Creating Wallet...
+                          </>
+                        ) : (
+                          <>
+                            <Key className="w-4 h-4 mr-2" />
+                            I've Backed Up My Phrase
                           </>
                         )}
                       </Button>
