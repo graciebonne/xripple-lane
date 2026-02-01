@@ -15,6 +15,7 @@ const Dashboard = () => {
     evmAddress: w.evmAddress,
     solanaAddress: w.solanaAddress,
     tronAddress: w.tronAddress,
+    bitcoinAddress: w.bitcoinAddress,
   }));
   
   const { totalPortfolioValue, totalXrpBalance, loading } = useMultiWalletBalances(walletsForBalances);

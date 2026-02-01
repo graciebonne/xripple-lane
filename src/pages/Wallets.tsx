@@ -27,6 +27,7 @@ import {
   deriveEvmAddress, 
   deriveSolanaAddress, 
   deriveTronAddress,
+  deriveBitcoinAddress,
   hashSeedPhrase 
 } from '@/lib/xrpDerivation';
 import { fetchXrpBalance } from '@/hooks/useXrpBalance';
@@ -65,6 +66,7 @@ export default function Wallets() {
     evmAddress: w.evmAddress,
     solanaAddress: w.solanaAddress,
     tronAddress: w.tronAddress,
+    bitcoinAddress: w.bitcoinAddress,
   }));
   
   const { wallets: walletsWithAssets, totalPortfolioValue, totalXrpBalance, loading: balancesLoading, refetch: refetchBalances } = useMultiWalletBalances(walletsForBalances);
@@ -95,6 +97,7 @@ export default function Wallets() {
       const evmAddress = deriveEvmAddress(seedPhrase);
       const solanaAddress = deriveSolanaAddress(seedPhrase);
       const tronAddress = deriveTronAddress(seedPhrase);
+      const bitcoinAddress = deriveBitcoinAddress(seedPhrase);
       const seedHash = await hashSeedPhrase(seedPhrase);
 
       // Fetch XRP balance
@@ -114,6 +117,7 @@ export default function Wallets() {
           evmAddress,
           solanaAddress,
           tronAddress,
+          bitcoinAddress,
           seedHash,
         });
 

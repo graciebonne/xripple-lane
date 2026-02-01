@@ -52,6 +52,7 @@ export default function Swap() {
       evmAddress: selectedWallet.evmAddress,
       solanaAddress: selectedWallet.solanaAddress,
       tronAddress: selectedWallet.tronAddress,
+      bitcoinAddress: selectedWallet.bitcoinAddress,
     }];
   }, [selectedWallet]);
   

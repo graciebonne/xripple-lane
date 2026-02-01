@@ -5,7 +5,8 @@ import {
   getNativeBalance, 
   getTokenBalance,
   getSolanaBalance,
-  getTronBalance 
+  getTronBalance,
+  getBitcoinBalance 
 } from '@/lib/reown';
 import { fetchXrpBalance } from './useXrpBalance';
 import { usePrices } from './usePrices';
@@ -30,6 +31,7 @@ export interface WalletWithAssets {
   evmAddress?: string;
   solanaAddress?: string;
   tronAddress?: string;
+  bitcoinAddress?: string;
   tokens: WalletToken[];
   totalValueUSD: number;
 }
@@ -57,6 +59,7 @@ const TOKEN_ICONS: Record<string, string> = {
   AVAX: '🔺',
   SOL: '◎',
   TRX: '⚡',
+  BTC: '₿',
   XRP: '✕',
 };
 
@@ -68,6 +71,7 @@ export function useMultiWalletBalances(
     evmAddress?: string;
     solanaAddress?: string;
     tronAddress?: string;
+    bitcoinAddress?: string;
   }>
 ): MultiWalletBalancesResult {
   const [walletsWithAssets, setWalletsWithAssets] = useState<WalletWithAssets[]>([]);
@@ -105,12 +109,19 @@ export function useMultiWalletBalances(
         const walletsData: WalletWithAssets[] = await Promise.all(
           wallets.map(async (wallet) => {
             const tokens: WalletToken[] = [];
+            let xrpBalance = '0';
+            let xrpBalanceUSD = 0;
+            const balancePromises: Promise<void>[] = [];
             
             // Fetch XRP balance
-            const xrpBalance = await fetchXrpBalance(wallet.xrpAddress);
-            const xrpPrice = getTokenPrice('xrp');
-            const xrpBalanceNum = parseFloat(xrpBalance);
-            const xrpBalanceUSD = xrpBalanceNum * xrpPrice;
+            balancePromises.push(
+              (async () => {
+                xrpBalance = await fetchXrpBalance(wallet.xrpAddress);
+                const xrpPrice = getTokenPrice('xrp');
+                const xrpBalanceNum = parseFloat(xrpBalance);
+                xrpBalanceUSD = xrpBalanceNum * xrpPrice;
+              })()
+            );
 
             // Fetch EVM balances if address exists
             if (wallet.evmAddress) {
@@ -118,86 +129,127 @@ export function useMultiWalletBalances(
                 const chainTokens = CHAIN_TOKENS[chainKey as keyof typeof CHAIN_TOKENS] || [];
                 
                 for (const token of chainTokens) {
-                  try {
-                    let balance: string;
-                    
-                    if (token.address) {
-                      // ERC-20 token
-                      balance = await getTokenBalance(
-                        token.address,
-                        wallet.evmAddress,
-                        chainInfo.rpcUrl,
-                        token.decimals
-                      );
-                    } else {
-                      // Native token
-                      balance = await getNativeBalance(wallet.evmAddress, chainInfo.rpcUrl);
-                    }
-                    
-                    const balanceNum = parseFloat(balance);
-                    if (balanceNum > 0) {
-                      const price = getTokenPrice(token.symbol);
-                      tokens.push({
-                        symbol: token.symbol,
-                        name: token.name,
-                        balance,
-                        balanceUSD: balanceNum * price,
-                        chain: chainInfo.name,
-                        chainId: chainKey,
-                        icon: TOKEN_ICONS[token.symbol] || '🪙',
-                        address: token.address,
-                      });
-                    }
-                  } catch (err) {
-                    // Silently skip failed token fetches
-                  }
+                  balancePromises.push(
+                    (async () => {
+                      try {
+                        let balance: string;
+                        
+                        if (token.address) {
+                          // ERC-20 token
+                          balance = await getTokenBalance(
+                            token.address,
+                            wallet.evmAddress!,
+                            chainInfo.rpcUrl,
+                            token.decimals
+                          );
+                        } else {
+                          // Native token
+                          balance = await getNativeBalance(wallet.evmAddress!, chainInfo.rpcUrl);
+                        }
+                        
+                        const balanceNum = parseFloat(balance);
+                        if (balanceNum > 0) {
+                          const price = getTokenPrice(token.symbol);
+                          tokens.push({
+                            symbol: token.symbol,
+                            name: token.name,
+                            balance,
+                            balanceUSD: balanceNum * price,
+                            chain: chainInfo.name,
+                            chainId: chainKey,
+                            icon: TOKEN_ICONS[token.symbol] || '🪙',
+                            address: token.address,
+                          });
+                        }
+                      } catch (err) {
+                        // Silently skip failed token fetches
+                      }
+                    })()
+                  );
                 }
               }
             }
 
             // Fetch Solana balance if address exists
             if (wallet.solanaAddress) {
-              try {
-                const solBalance = await getSolanaBalance(wallet.solanaAddress);
-                const balanceNum = parseFloat(solBalance);
-                if (balanceNum > 0) {
-                  const price = getTokenPrice('sol');
-                  tokens.push({
-                    symbol: 'SOL',
-                    name: 'Solana',
-                    balance: solBalance,
-                    balanceUSD: balanceNum * price,
-                    chain: 'Solana',
-                    chainId: 'solana',
-                    icon: TOKEN_ICONS.SOL,
-                  });
-                }
-              } catch (err) {
-                // Silently skip
-              }
+              balancePromises.push(
+                (async () => {
+                  try {
+                    const solBalance = await getSolanaBalance(wallet.solanaAddress);
+                    const balanceNum = parseFloat(solBalance);
+                    if (balanceNum > 0) {
+                      const price = getTokenPrice('sol');
+                      tokens.push({
+                        symbol: 'SOL',
+                        name: 'Solana',
+                        balance: solBalance,
+                        balanceUSD: balanceNum * price,
+                        chain: 'Solana',
+                        chainId: 'solana',
+                        icon: TOKEN_ICONS.SOL,
+                      });
+                    }
+                  } catch (err) {
+                    // Silently skip
+                  }
+                })()
+              );
             }
 
             // Fetch TRON balance if address exists
             if (wallet.tronAddress) {
-              try {
-                const trxBalance = await getTronBalance(wallet.tronAddress);
-                const balanceNum = parseFloat(trxBalance);
-                if (balanceNum > 0) {
-                  const price = getTokenPrice('trx');
-                  tokens.push({
-                    symbol: 'TRX',
-                    name: 'TRON',
-                    balance: trxBalance,
-                    balanceUSD: balanceNum * price,
-                    chain: 'TRON',
-                    chainId: 'tron',
-                    icon: TOKEN_ICONS.TRX,
-                  });
-                }
-              } catch (err) {
-                // Silently skip
-              }
+              balancePromises.push(
+                (async () => {
+                  try {
+                    const trxBalance = await getTronBalance(wallet.tronAddress);
+                    const balanceNum = parseFloat(trxBalance);
+                    if (balanceNum > 0) {
+                      const price = getTokenPrice('trx');
+                      tokens.push({
+                        symbol: 'TRX',
+                        name: 'TRON',
+                        balance: trxBalance,
+                        balanceUSD: balanceNum * price,
+                        chain: 'TRON',
+                        chainId: 'tron',
+                        icon: TOKEN_ICONS.TRX,
+                      });
+                    }
+                  } catch (err) {
+                    // Silently skip
+                  }
+                })()
+              );
             }
+
+            // Fetch Bitcoin balance if address exists
+            if (wallet.bitcoinAddress) {
+              balancePromises.push(
+                (async () => {
+                  try {
+                    const btcBalance = await getBitcoinBalance(wallet.bitcoinAddress);
+                    const balanceNum = parseFloat(btcBalance);
+                    if (balanceNum > 0) {
+                      const price = getTokenPrice('btc');
+                      tokens.push({
+                        symbol: 'BTC',
+                        name: 'Bitcoin',
+                        balance: btcBalance,
+                        balanceUSD: balanceNum * price,
+                        chain: 'Bitcoin',
+                        chainId: 'bitcoin',
+                        icon: TOKEN_ICONS.BTC,
+                      });
+                    }
+                  } catch (err) {
+                    // Silently skip
+                  }
+                })()
+              );
+            }
+
+            // Wait for all balance fetches to complete
+            await Promise.all(balancePromises);
 
             const totalTokenValue = tokens.reduce((sum, t) => sum + t.balanceUSD, 0);
 
@@ -210,6 +262,7 @@ export function useMultiWalletBalances(
               evmAddress: wallet.evmAddress,
               solanaAddress: wallet.solanaAddress,
               tronAddress: wallet.tronAddress,
+              bitcoinAddress: wallet.bitcoinAddress,
               tokens,
               totalValueUSD: xrpBalanceUSD + totalTokenValue,
             };

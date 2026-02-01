@@ -9,6 +9,7 @@ export interface ImportedWallet {
   evmAddress?: string;   // If EVM-compatible
   solanaAddress?: string;
   tronAddress?: string;
+  bitcoinAddress?: string;
   seedHash?: string;     // Hash of seed phrase for verification
   importedAt: string;    // ISO timestamp
 }
