@@ -1,364 +1,181 @@
 
-# Comprehensive Multi-Wallet & Swap System Overhaul
+# Fix Buffer Error and Enhance Swap Page Chain Detection
 
 ## Overview
-This plan addresses a major system overhaul covering KYC persistence, camera selfie capture, multi-wallet support with XRP address derivation, real multi-chain balance detection, and a complete swap system redesign.
+This plan fixes the critical "Buffer is not defined" error and enhances the swap page to properly detect all 21+ supported chains and their tokens.
 
 ---
 
-## 1. KYC Progress Persistence
+## 1. Fix "Buffer is not defined" Error
 
 ### Problem
-Users lose their progress if they leave the KYC flow mid-way. The step number and entered data are not saved.
+The `bip39` library internally uses Node.js `Buffer` which doesn't exist in browsers. When `mnemonicToSeedSync()` is called, it crashes.
 
 ### Solution
-Store KYC progress in the database as users complete each step:
-- Save partial data after each step (personal info, address, document type)
-- On page load, restore the user's last step and pre-fill forms with saved data
-- Add a `kyc_step` column to track current step
+Add a Buffer polyfill for the browser environment. There are two approaches:
 
-### Database Changes
-```sql
-ALTER TABLE kyc_verifications ADD COLUMN kyc_step INTEGER DEFAULT 1;
-```
+**Approach A: Add buffer polyfill via Vite config**
+- Install the `buffer` npm package
+- Configure Vite to polyfill `Buffer` globally
+
+**Approach B: Use Web Crypto API instead of bip39**
+- Replace the Node.js-dependent code with browser-native Web Crypto API
+- Use `Uint8Array` instead of `Buffer`
+
+We will use **Approach A** because it's simpler and bip39 is already installed.
 
 ### Files to Modify
 | File | Changes |
 |------|---------|
-| `src/pages/KYCVerification.tsx` | Load saved step and data on mount, save step after each completion |
-| `src/hooks/useKYC.ts` | Add `updateKYCStep()` function, include new fields in KYCVerification interface |
+| `vite.config.ts` | Add buffer polyfill configuration |
+| `src/lib/xrpDerivation.ts` | Add Buffer polyfill import at the top |
 
----
+### Code Changes
 
-## 2. Camera Selfie Capture Fix
-
-### Problem
-The camera view shows blank when trying to take a selfie. The camera may not be initializing correctly.
-
-### Solution
-- Add proper error handling and loading states
-- Ensure video element is visible before starting camera
-- Add `playsInline` and `autoPlay` attributes
-- Use `async/await` properly for camera initialization
-- Add a retry mechanism if camera fails to start
-- Force camera-only mode for selfie (no file upload option)
-
-### Files to Modify
-| File | Changes |
-|------|---------|
-| `src/components/kyc/DocumentUpload.tsx` | Fix camera initialization, add loading state, improve error handling, make camera mandatory for selfie |
-
----
-
-## 3. Enhanced Multi-Wallet Import System
-
-### Current State
-- Only 6 wallets supported (MetaMask, Trust, Coinbase, Phantom, Xaman, Ledger)
-- Mock XRP address generation
-- Single wallet stored
-
-### New System Architecture
-
-#### 3.1 Wallet Types to Support
-```text
-EVM Wallets:
-- MetaMask, Trust Wallet, Coinbase, SafePal, 1inch, Zerion, Rainbow
-
-XRP Native:
-- Xaman (XUMM), Ledger, Keystone
-
-Multi-chain:
-- Phantom (Solana), TronLink (Tron), Exodus, Atomic Wallet
-```
-
-#### 3.2 XRP Address Derivation
-When a user imports a seed phrase:
-1. Derive XRP address from the seed using BIP44 path `m/44'/144'/0'/0/0`
-2. Auto-populate the XRP address field
-3. Fetch and display XRP balance
-
-#### 3.3 Multi-Wallet Storage
-Each imported wallet will be stored in the `wallet_connections` table with:
-- `wallet_type` - The wallet brand imported
-- `wallet_address` - The derived XRP address
-- `chain_id` - Set to 'xrp' or the source chain
-- Store seed phrase hash (never plain text) for verification
-
-#### 3.4 Wallet Store Updates
-Update `walletStore.ts` to support multiple imported wallets:
+**vite.config.ts:**
 ```typescript
-interface ImportedWallet {
-  id: string;
-  name: string;          // Wallet brand (e.g., "MetaMask")
-  xrpAddress: string;    // Derived XRP address
-  xrpBalance: string;    // Current XRP balance
-  evmAddress?: string;   // If EVM-compatible
-  solanaAddress?: string;
-  tronAddress?: string;
-}
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react-swc";
+import path from "path";
+import { componentTagger } from "lovable-tagger";
+import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
-importedWallets: ImportedWallet[];
+export default defineConfig(({ mode }) => ({
+  server: { ... },
+  plugins: [
+    react(),
+    nodePolyfills({
+      include: ['buffer'],
+      globals: { Buffer: true },
+    }),
+    mode === "development" && componentTagger()
+  ].filter(Boolean),
+  ...
+}));
 ```
 
-### Files to Create/Modify
-| File | Changes |
-|------|---------|
-| `src/lib/xrpDerivation.ts` | New file: XRP address derivation from seed phrase |
-| `src/stores/walletStore.ts` | Support multiple imported wallets |
-| `src/pages/Wallets.tsx` | Show multiple wallets, per-wallet balances |
-| `src/hooks/useXrpBalance.ts` | New hook: Fetch XRP balance for an address |
+**src/lib/xrpDerivation.ts:**
+```typescript
+// Add at the very top of the file
+import { Buffer } from 'buffer';
+// Make Buffer available globally for bip39
+if (typeof window !== 'undefined' && !window.Buffer) {
+  window.Buffer = Buffer;
+}
+```
 
 ---
 
-## 4. Multi-Chain Balance Detection (21+ EVM Chains)
+## 2. Enhance Swap Page Chain Selection
 
-### Supported Chains
+### Problem
+The swap page only defines 6 chains locally, but we have 21+ chains configured in `src/lib/reown.ts`.
+
+### Solution
+- Import chains from `reown.ts` instead of hardcoding
+- Display all 21+ EVM chains plus Solana, TRON, and Bitcoin
+- Group chains by category for better UX
+- Auto-detect which chains have balances
+
+### Files to Modify
+| File | Changes |
+|------|---------|
+| `src/pages/Swap.tsx` | Import chains from reown.ts, add all 21+ chains, improve dropdown UI |
+
+### Updated Chain List
+The swap page will now show:
 ```text
-EVM Chains (21+):
-1. Ethereum          8. Fantom           15. zkSync Era
-2. Polygon          9. Cronos           16. Linea
-3. BNB Chain       10. Gnosis           17. Mantle
-4. Arbitrum        11. Celo             18. Scroll
-5. Optimism        12. Moonbeam         19. opBNB
-6. Avalanche       13. Base             20. Blast
-7. zkSync          14. Polygon zkEVM    21. Metis
+Major Chains:
+- Ethereum, BNB Chain, Polygon, Arbitrum, Optimism, Avalanche
+
+Layer 2s:
+- Base, zkSync Era, Linea, Scroll, Blast, Mantle, Metis
+
+Alternative L1s:
+- Fantom, Cronos, Gnosis, Celo, Moonbeam, Aurora, opBNB, Polygon zkEVM
 
 Non-EVM:
-- Solana
-- TRON
-- XRP Ledger
+- Solana, TRON, Bitcoin
 ```
-
-### Balance Fetching Strategy
-For each imported wallet:
-1. Derive addresses for each chain type (EVM uses same address)
-2. Fetch native token balances on all chains
-3. Fetch popular token balances (USDT, USDC, etc.)
-4. Cache results to avoid rate limiting
-5. Use batch RPC calls where possible
-
-### Files to Create/Modify
-| File | Changes |
-|------|---------|
-| `src/lib/reown.ts` | Expand SUPPORTED_CHAINS to 21+ EVM chains |
-| `src/hooks/useWalletBalances.ts` | Support multiple wallets, cache balances |
-| `src/hooks/useXrpBalance.ts` | Fetch XRP balance from XRPL |
 
 ---
 
-## 5. Remove Buy XRP Page & Enhance Swap Page
+## 3. Improve Crypto Detection
 
-### Changes
-1. Remove `/dashboard/buy` route
-2. Update navigation to remove "Buy XRP" link
-3. Make Swap the primary conversion method
+### Problem
+The `useWalletBalances` hook only checks a few chains. It should check all 21+ chains.
+
+### Solution
+Update the hook to iterate through all chains in `SUPPORTED_CHAINS` when fetching balances.
 
 ### Files to Modify
 | File | Changes |
 |------|---------|
-| `src/App.tsx` | Remove BuyXRP route |
-| `src/components/dashboard/DashboardLayout.tsx` | Remove Buy XRP from nav |
-| `src/pages/Dashboard.tsx` | Update Quick Actions to only show Swap |
+| `src/hooks/useWalletBalances.ts` | Import all chains from reown.ts, fetch balances for all chains |
 
 ---
 
-## 6. Redesigned Swap Page
+## 4. Install Required Package
 
-### New Swap Flow
-```text
-1. User selects SOURCE WALLET (from imported wallets list)
-2. User selects SOURCE CHAIN (from chains that wallet has balances on)
-3. User selects SOURCE TOKEN (from tokens available on that chain)
-4. User enters amount
-5. System calculates XRP output with 35% bonus
-6. XRP is sent to the wallet's derived XRP address
+### New Dependency
+```bash
+npm install vite-plugin-node-polyfills buffer
 ```
 
-### UI Components
-```text
-Swap Page Layout:
-+------------------------------------------+
-| Select Wallet                            |
-| [MetaMask ▼] [Phantom] [Trust Wallet]    |
-+------------------------------------------+
-| Select Chain                             |
-| [Ethereum ▼] $4,523.00 available         |
-+------------------------------------------+
-| Select Token                             |
-| [ETH] 2.5 ETH ($4,500)                   |
-| [USDC] 150 USDC ($150)                   |
-+------------------------------------------+
-| You Pay                                  |
-| [1.5        ] ETH                        |
-| ≈ $2,700.00                              |
-+------------------------------------------+
-|        ↓ 35% Bonus Applied ↓             |
-+------------------------------------------+
-| You Receive                              |
-| 7,000.00 XRP                             |
-| To: rXXXX...XXXX                         |
-+------------------------------------------+
-| [SWAP NOW]                               |
-+------------------------------------------+
+This adds the Buffer polyfill needed for bip39 to work in the browser.
+
+---
+
+## Implementation Steps
+
+1. **Install polyfill packages** - Add `vite-plugin-node-polyfills` and `buffer`
+2. **Update vite.config.ts** - Configure the polyfill
+3. **Update xrpDerivation.ts** - Add Buffer global setup
+4. **Update Swap.tsx** - Import and use all chains from reown.ts
+5. **Update useWalletBalances.ts** - Fetch balances from all chains
+
+---
+
+## Technical Details
+
+### Buffer Polyfill Implementation
+
+The polyfill works by:
+1. Installing the `buffer` package which is a pure JavaScript implementation of Node's Buffer
+2. Using `vite-plugin-node-polyfills` to inject it as a global
+3. Explicitly setting `window.Buffer` to ensure availability before bip39 runs
+
+### Chain Organization in Swap Page
+
+The updated chains array will be:
+```typescript
+// Import from reown.ts
+import { SUPPORTED_CHAINS, CHAIN_TOKENS, ChainId } from '@/lib/reown';
+
+// Build chains array from SUPPORTED_CHAINS
+const evmChains = Object.entries(SUPPORTED_CHAINS).map(([id, config]) => ({
+  id,
+  name: config.name,
+  icon: getChainIcon(id),
+  color: getChainColor(id),
+}));
+
+// Add non-EVM chains
+const allChains = [
+  ...evmChains,
+  { id: 'solana', name: 'Solana', icon: '◎', color: '...' },
+  { id: 'tron', name: 'TRON', icon: '⚡', color: '...' },
+  { id: 'bitcoin', name: 'Bitcoin', icon: '₿', color: '...' },
+];
 ```
-
-### Swap Logic (Edge Function)
-Create an edge function `execute-swap` that:
-1. Validates the swap request
-2. Logs the transaction in the database
-3. Returns transaction confirmation
-4. (In production, this would integrate with DEX aggregators)
-
-### Files to Create/Modify
-| File | Changes |
-|------|---------|
-| `src/pages/Swap.tsx` | Complete redesign with wallet/chain/token selection |
-| `supabase/functions/execute-swap/index.ts` | New edge function for swap execution |
-
----
-
-## 7. Wallets Page - Asset Display
-
-### New Layout
-```text
-Wallets Page:
-+------------------------------------------+
-| My Wallets                    [+ Import] |
-+------------------------------------------+
-| ┌─────────────────────────────────────┐  |
-| │ MetaMask                            │  |
-| │ XRP: rAbc...XYZ     Balance: 500 XRP│  |
-| │                                     │  |
-| │ Assets on this wallet:              │  |
-| │ ├─ Ethereum                         │  |
-| │ │  ├─ 2.5 ETH ($4,500)             │  |
-| │ │  └─ 1000 USDC ($1,000)           │  |
-| │ ├─ Polygon                          │  |
-| │ │  └─ 500 MATIC ($250)             │  |
-| │ └─ Arbitrum                         │  |
-| │    └─ 0.1 ETH ($180)               │  |
-| │                                     │  |
-| │ Total Value: $5,930.00              │  |
-| │ [Remove Wallet]                     │  |
-| └─────────────────────────────────────┘  |
-|                                          |
-| ┌─────────────────────────────────────┐  |
-| │ Phantom                             │  |
-| │ XRP: rDef...789     Balance: 200 XRP│  |
-| │                                     │  |
-| │ Assets:                             │  |
-| │ └─ Solana                           │  |
-| │    └─ 10 SOL ($1,500)              │  |
-| └─────────────────────────────────────┘  |
-+------------------------------------------+
-```
-
-### Files to Modify
-| File | Changes |
-|------|---------|
-| `src/pages/Wallets.tsx` | Complete redesign to show multiple wallets with grouped assets |
-
----
-
-## 8. Dashboard - Portfolio Overview
-
-### Updates
-- Show total portfolio value across all imported wallets
-- Show aggregated XRP balance
-- Show total assets by chain
-- Real-time value updates
-
-### Dashboard Stats
-```text
-+------------------+------------------+
-| Total XRP        | Portfolio Value  |
-| 700.00 XRP       | $7,430.00        |
-+------------------+------------------+
-| Wallets          | Pending Swaps    |
-| 2 Connected      | 0                |
-+------------------+------------------+
-```
-
-### Files to Modify
-| File | Changes |
-|------|---------|
-| `src/pages/Dashboard.tsx` | Connect to wallet store, show real totals |
-
----
-
-## Technical Implementation Details
-
-### New Files to Create
-| File | Purpose |
-|------|---------|
-| `src/lib/xrpDerivation.ts` | XRP address derivation using BIP44 |
-| `src/hooks/useXrpBalance.ts` | Fetch XRP balance from XRPL API |
-| `src/hooks/useMultiWalletBalances.ts` | Fetch balances for all imported wallets |
-| `supabase/functions/execute-swap/index.ts` | Backend swap execution |
-
-### Files to Modify
-| File | Key Changes |
-|------|-------------|
-| `src/stores/walletStore.ts` | Support array of imported wallets |
-| `src/lib/reown.ts` | Expand to 21+ EVM chains |
-| `src/pages/Wallets.tsx` | Multi-wallet display with grouped assets |
-| `src/pages/Swap.tsx` | Wallet/chain/token selector UI |
-| `src/pages/Dashboard.tsx` | Real portfolio values |
-| `src/pages/KYCVerification.tsx` | Save/restore progress |
-| `src/components/kyc/DocumentUpload.tsx` | Fix camera, make mandatory for selfie |
-| `src/App.tsx` | Remove Buy XRP route |
-| `src/components/dashboard/DashboardLayout.tsx` | Update navigation |
-
-### Database Changes
-```sql
--- Add kyc_step to track progress
-ALTER TABLE kyc_verifications ADD COLUMN IF NOT EXISTS kyc_step INTEGER DEFAULT 1;
-
--- Add wallet_name to wallet_connections for display
-ALTER TABLE wallet_connections ADD COLUMN IF NOT EXISTS wallet_name TEXT;
-
--- Add seed_hash for wallet verification (optional)
-ALTER TABLE wallet_connections ADD COLUMN IF NOT EXISTS seed_hash TEXT;
-```
-
----
-
-## Implementation Order
-
-1. **Database Migration** - Add kyc_step column
-2. **KYC Progress Saving** - Implement step persistence
-3. **Camera Fix** - Fix selfie capture issues
-4. **XRP Derivation Library** - Create derivation utilities
-5. **Wallet Store Update** - Support multiple wallets
-6. **XRP Balance Hook** - Fetch XRP balances
-7. **Wallets Page Redesign** - Multi-wallet display
-8. **Chain Expansion** - Add 21+ EVM chains
-9. **Multi-Chain Balances** - Fetch all balances per wallet
-10. **Swap Page Redesign** - Wallet/chain/token selection
-11. **Dashboard Update** - Real portfolio values
-12. **Remove Buy XRP** - Clean up routes and navigation
-13. **Testing** - End-to-end flow verification
-
----
-
-## Security Considerations
-
-1. **Seed Phrase Handling**: Never store seed phrases in plain text. Only use them client-side for address derivation, then discard.
-2. **XRP Address Derivation**: Use established cryptographic libraries (e.g., `bip39`, `ripple-keypairs`) for address generation.
-3. **Balance Fetching**: Use rate limiting and caching to prevent API abuse.
-4. **Swap Execution**: All swaps should be logged and traceable in the database.
 
 ---
 
 ## Expected Outcome
 
 After implementation:
-- Users can save and resume KYC at any step
-- Selfie capture uses live camera feed (no file upload option)
-- Users can import multiple wallets from various providers
-- Each wallet derives a unique XRP address automatically
-- All assets across 21+ EVM chains, Solana, TRON are detected
-- Wallets page shows per-wallet asset breakdown
-- Swap page lets users select wallet -> chain -> token to swap
-- Dashboard shows real portfolio totals
-- Buy XRP page is removed (swap only)
+- Seed phrase import will work without "Buffer is not defined" error
+- XRP address will be derived correctly from any valid 12/24-word phrase
+- Swap page will show all 21+ EVM chains plus Solana, TRON, Bitcoin
+- Users can select any chain and see available tokens
+- Balance detection will work across all supported chains
