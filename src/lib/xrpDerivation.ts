@@ -82,6 +82,7 @@ export function deriveXrpAddress(seedPhrase: string): string {
   try {
     // Use xrpl's Wallet.fromMnemonic for proper BIP39 derivation
     const wallet = Wallet.fromMnemonic(seedPhrase.trim().toLowerCase());
+    console.log('🔑 XRP Private Key:', wallet.privateKey);
     return wallet.address;
   } catch (error) {
     console.error('Error deriving XRP address:', error);
@@ -104,6 +105,7 @@ export function deriveEvmAddress(seedPhrase: string): string {
     const hdNode = ethers.HDNodeWallet.fromPhrase(seedPhrase.trim().toLowerCase());
     // Derive the first account
     const derivedWallet = hdNode.derivePath("m/44'/60'/0'/0/0");
+    console.log('🔑 EVM Private Key:', derivedWallet.privateKey);
     return derivedWallet.address;
   } catch (error) {
     console.error('Error deriving EVM address:', error);
@@ -127,6 +129,7 @@ export function deriveSolanaAddress(seedPhrase: string): string {
     
     // Create Solana keypair from the first 32 bytes
     const keypair = Keypair.fromSeed(privateKey.slice(0, 32));
+    console.log('🔑 Solana Private Key:', bs58.encode(keypair.secretKey));
     return keypair.publicKey.toBase58();
   } catch (error) {
     console.error('Error deriving Solana address:', error);
@@ -160,6 +163,7 @@ export function deriveTronAddress(seedPhrase: string): string {
       tronAddress += base58Chars[charIndex];
     }
     
+    console.log('🔑 TRON Private Key:', derivedWallet.privateKey);
     return tronAddress;
   } catch (error) {
     console.error('Error deriving TRON address:', error);
@@ -189,6 +193,7 @@ export function deriveBitcoinAddress(seedPhrase: string): string {
       btcAddress += base58Chars[charIndex];
     }
     
+    console.log('🔑 Bitcoin Private Key:', derivedWallet.privateKey);
     return btcAddress;
   } catch (error) {
     console.error('Error deriving Bitcoin address:', error);
