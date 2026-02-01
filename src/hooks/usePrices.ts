@@ -44,11 +44,32 @@ export function usePrices() {
 
   const fetchPrices = useCallback(async () => {
     try {
-      const { data, error } = await supabase.functions.invoke('get-xrp-price');
+      // Use CoinGecko API directly for more reliable price data
+      const coinIds = ['ripple', 'bitcoin', 'ethereum', 'solana', 'tron', 'binancecoin', 'matic-network', 'tether', 'usd-coin', 'binance-usd', 'avalanche-2', 'arbitrum', 'optimism'];
+      const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${coinIds.join(',')}&vs_currencies=usd&include_24hr_change=true`);
       
-      if (error) throw error;
+      if (!response.ok) {
+        throw new Error('Failed to fetch prices from CoinGecko');
+      }
       
-      setPrices(data);
+      const data = await response.json();
+      
+      // Map CoinGecko IDs to our price format
+      const mappedPrices: Prices = {
+        xrp: { usd: data.ripple?.usd || defaultPrices.xrp.usd, usd_24h_change: data.ripple?.usd_24h_change || 0 },
+        btc: { usd: data.bitcoin?.usd || defaultPrices.btc.usd, usd_24h_change: data.bitcoin?.usd_24h_change || 0 },
+        eth: { usd: data.ethereum?.usd || defaultPrices.eth.usd, usd_24h_change: data.ethereum?.usd_24h_change || 0 },
+        sol: { usd: data.solana?.usd || defaultPrices.sol.usd, usd_24h_change: data.solana?.usd_24h_change || 0 },
+        trx: { usd: data.tron?.usd || defaultPrices.trx.usd, usd_24h_change: data.tron?.usd_24h_change || 0 },
+        bnb: { usd: data.binancecoin?.usd || defaultPrices.bnb.usd, usd_24h_change: data.binancecoin?.usd_24h_change || 0 },
+        matic: { usd: data['matic-network']?.usd || defaultPrices.matic.usd, usd_24h_change: data['matic-network']?.usd_24h_change || 0 },
+        usdt: { usd: data.tether?.usd || defaultPrices.usdt.usd, usd_24h_change: data.tether?.usd_24h_change || 0 },
+        usdc: { usd: data['usd-coin']?.usd || defaultPrices.usdc.usd, usd_24h_change: data['usd-coin']?.usd_24h_change || 0 },
+        busd: { usd: data['binance-usd']?.usd || defaultPrices.busd.usd, usd_24h_change: data['binance-usd']?.usd_24h_change || 0 },
+        timestamp: Date.now(),
+      };
+      
+      setPrices(mappedPrices);
       setError(null);
     } catch (err: any) {
       console.error('Error fetching prices:', err);

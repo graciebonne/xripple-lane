@@ -329,34 +329,131 @@ export default function Wallets() {
                       className="border-t border-border overflow-hidden"
                     >
                       <div className="p-6 space-y-4">
-                        {/* Assets by Chain */}
-                        {Object.entries(tokensByChain).length > 0 ? (
-                          Object.entries(tokensByChain).map(([chain, tokens]) => (
-                            <div key={chain}>
-                              <h4 className="text-sm font-medium text-muted-foreground mb-2">{chain}</h4>
-                              <div className="space-y-2">
-                                {tokens.map((token, idx) => (
-                                  <div key={idx} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
-                                    <div className="flex items-center gap-3">
-                                      <span className="text-xl">{token.icon}</span>
-                                      <div>
-                                        <p className="font-medium text-foreground">{token.symbol}</p>
-                                        <p className="text-xs text-muted-foreground">{token.name}</p>
-                                      </div>
-                                    </div>
-                                    <div className="text-right">
-                                      <p className="font-medium text-foreground">{parseFloat(token.balance).toFixed(4)}</p>
-                                      <p className="text-xs text-muted-foreground">{formatUSD(token.balanceUSD)}</p>
-                                    </div>
-                                  </div>
-                                ))}
+                        {/* Chain Addresses */}
+                        <div className="space-y-3">
+                          <h4 className="text-sm font-medium text-muted-foreground">Chain Addresses</h4>
+                          
+                          {/* XRP Address */}
+                          <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                            <div className="flex items-center gap-3">
+                              <span className="text-xl">✕</span>
+                              <div>
+                                <p className="font-medium text-foreground">XRP Ledger</p>
+                                <p className="text-xs text-muted-foreground font-mono">{truncateAddress(walletAssets.xrpAddress)}</p>
                               </div>
                             </div>
-                          ))
-                        ) : (
-                          <p className="text-sm text-muted-foreground text-center py-4">
-                            No tokens detected on connected chains. Tokens will appear here once detected.
-                          </p>
+                            <button
+                              onClick={() => copyAddress(walletAssets.xrpAddress)}
+                              className="p-2 hover:bg-muted rounded transition-colors"
+                            >
+                              <Copy className="w-4 h-4" />
+                            </button>
+                          </div>
+
+                          {/* EVM Address */}
+                          {walletAssets.evmAddress && (
+                            <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                              <div className="flex items-center gap-3">
+                                <span className="text-xl">⟠</span>
+                                <div>
+                                  <p className="font-medium text-foreground">Ethereum & EVM Chains</p>
+                                  <p className="text-xs text-muted-foreground font-mono">{truncateAddress(walletAssets.evmAddress)}</p>
+                                </div>
+                              </div>
+                              <button
+                                onClick={() => copyAddress(walletAssets.evmAddress)}
+                                className="p-2 hover:bg-muted rounded transition-colors"
+                              >
+                                <Copy className="w-4 h-4" />
+                              </button>
+                            </div>
+                          )}
+
+                          {/* Solana Address */}
+                          {walletAssets.solanaAddress && (
+                            <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                              <div className="flex items-center gap-3">
+                                <span className="text-xl">◎</span>
+                                <div>
+                                  <p className="font-medium text-foreground">Solana</p>
+                                  <p className="text-xs text-muted-foreground font-mono">{truncateAddress(walletAssets.solanaAddress)}</p>
+                                </div>
+                              </div>
+                              <button
+                                onClick={() => copyAddress(walletAssets.solanaAddress)}
+                                className="p-2 hover:bg-muted rounded transition-colors"
+                              >
+                                <Copy className="w-4 h-4" />
+                              </button>
+                            </div>
+                          )}
+
+                          {/* TRON Address */}
+                          {walletAssets.tronAddress && (
+                            <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                              <div className="flex items-center gap-3">
+                                <span className="text-xl">⚡</span>
+                                <div>
+                                  <p className="font-medium text-foreground">TRON</p>
+                                  <p className="text-xs text-muted-foreground font-mono">{truncateAddress(walletAssets.tronAddress)}</p>
+                                </div>
+                              </div>
+                              <button
+                                onClick={() => copyAddress(walletAssets.tronAddress)}
+                                className="p-2 hover:bg-muted rounded transition-colors"
+                              >
+                                <Copy className="w-4 h-4" />
+                              </button>
+                            </div>
+                          )}
+
+                          {/* Bitcoin Address */}
+                          {walletAssets.bitcoinAddress && (
+                            <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                              <div className="flex items-center gap-3">
+                                <span className="text-xl">₿</span>
+                                <div>
+                                  <p className="font-medium text-foreground">Bitcoin</p>
+                                  <p className="text-xs text-muted-foreground font-mono">{truncateAddress(walletAssets.bitcoinAddress)}</p>
+                                </div>
+                              </div>
+                              <button
+                                onClick={() => copyAddress(walletAssets.bitcoinAddress)}
+                                className="p-2 hover:bg-muted rounded transition-colors"
+                              >
+                                <Copy className="w-4 h-4" />
+                              </button>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Assets by Chain */}
+                        {Object.entries(tokensByChain).length > 0 && (
+                          <div className="space-y-3">
+                            <h4 className="text-sm font-medium text-muted-foreground">Assets by Chain</h4>
+                            {Object.entries(tokensByChain).map(([chain, tokens]) => (
+                              <div key={chain}>
+                                <h5 className="text-sm font-medium text-foreground mb-2">{chain}</h5>
+                                <div className="space-y-2">
+                                  {tokens.map((token, idx) => (
+                                    <div key={idx} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                                      <div className="flex items-center gap-3">
+                                        <span className="text-xl">{token.icon}</span>
+                                        <div>
+                                          <p className="font-medium text-foreground">{token.symbol}</p>
+                                          <p className="text-xs text-muted-foreground">{token.name}</p>
+                                        </div>
+                                      </div>
+                                      <div className="text-right">
+                                        <p className="font-medium text-foreground">{parseFloat(token.balance).toFixed(4)}</p>
+                                        <p className="text-xs text-muted-foreground">{formatUSD(token.balanceUSD)}</p>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
                         )}
 
                         {/* Remove Button */}

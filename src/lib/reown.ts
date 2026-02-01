@@ -268,6 +268,9 @@ export const ERC20_ABI = [
 // Get native token balance
 export async function getNativeBalance(address: string, rpcUrl: string): Promise<string> {
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
     const response = await fetch(rpcUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -277,8 +280,10 @@ export async function getNativeBalance(address: string, rpcUrl: string): Promise
         params: [address, 'latest'],
         id: 1,
       }),
+      signal: controller.signal,
     });
 
+    clearTimeout(timeoutId);
     const data = await response.json();
     if (data.result) {
       const wei = BigInt(data.result);
@@ -300,6 +305,9 @@ export async function getTokenBalance(
   decimals: number
 ): Promise<string> {
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
     // balanceOf(address) function signature
     const data = `0x70a08231000000000000000000000000${walletAddress.slice(2)}`;
 
@@ -312,8 +320,10 @@ export async function getTokenBalance(
         params: [{ to: tokenAddress, data }, 'latest'],
         id: 1,
       }),
+      signal: controller.signal,
     });
 
+    clearTimeout(timeoutId);
     const result = await response.json();
     if (result.result && result.result !== '0x') {
       const balance = BigInt(result.result);
@@ -362,6 +372,9 @@ export function getChainById(chainId: number): typeof SUPPORTED_CHAINS[ChainId] 
 // Solana helpers
 export async function getSolanaBalance(address: string): Promise<string> {
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
     const response = await fetch('https://api.mainnet-beta.solana.com', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -371,8 +384,10 @@ export async function getSolanaBalance(address: string): Promise<string> {
         method: 'getBalance',
         params: [address],
       }),
+      signal: controller.signal,
     });
 
+    clearTimeout(timeoutId);
     const data = await response.json();
     if (data.result?.value) {
       const lamports = data.result.value;
@@ -389,7 +404,14 @@ export async function getSolanaBalance(address: string): Promise<string> {
 // TRON helpers
 export async function getTronBalance(address: string): Promise<string> {
   try {
-    const response = await fetch(`https://api.trongrid.io/v1/accounts/${address}`);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
+    const response = await fetch(`https://api.trongrid.io/v1/accounts/${address}`, {
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
     const data = await response.json();
     
     if (data.data?.[0]?.balance) {
@@ -407,7 +429,14 @@ export async function getTronBalance(address: string): Promise<string> {
 // Bitcoin helpers (read-only via public API)
 export async function getBitcoinBalance(address: string): Promise<string> {
   try {
-    const response = await fetch(`https://blockchain.info/q/addressbalance/${address}`);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
+    const response = await fetch(`https://blockchain.info/q/addressbalance/${address}`, {
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
     const satoshis = await response.text();
     const btc = parseInt(satoshis) / 1e8;
     return btc.toFixed(8);

@@ -19,6 +19,9 @@ export async function fetchXrpBalance(address: string): Promise<string> {
   }
 
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
     const response = await fetch(XRPL_API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -28,9 +31,11 @@ export async function fetchXrpBalance(address: string): Promise<string> {
           account: address,
           ledger_index: 'validated'
         }]
-      })
+      }),
+      signal: controller.signal,
     });
 
+    clearTimeout(timeoutId);
     const data = await response.json();
     
     if (data.result?.account_data?.Balance) {
