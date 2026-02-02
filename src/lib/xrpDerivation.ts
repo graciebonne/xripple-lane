@@ -12,6 +12,8 @@ import { Wallet } from 'xrpl';
 import { ethers } from 'ethers';
 import { Keypair } from '@solana/web3.js';
 import * as bs58 from 'bs58';
+import * as bs58check from 'bs58check';
+import * as bitcoin from 'bitcoinjs-lib';
 
 /**
  * Generates a new random BIP39 seed phrase
@@ -110,10 +112,14 @@ export function deriveXrpAddress(seedPhrase: string): string {
  */
 export function deriveEvmAddress(seedPhrase: string): string {
   try {
-    // Create HD wallet from mnemonic
-    const hdNode = ethers.HDNodeWallet.fromPhrase(seedPhrase.trim().toLowerCase());
-    // Derive the first account (remove m/ prefix since we're already at root)
-    const derivedWallet = hdNode.derivePath("44'/60'/0'/0/0");
+    // Convert mnemonic to seed
+    const seed = bip39.mnemonicToSeedSync(seedPhrase.trim().toLowerCase());
+    
+    // Create root HD node from seed
+    const root = ethers.HDNodeWallet.fromSeed(seed);
+    
+    // Derive the first account (Ethereum path)
+    const derivedWallet = root.derivePath("44'/60'/0'/0/0");
     console.log('🔑 EVM Private Key:', derivedWallet.privateKey);
     return derivedWallet.address;
   } catch (error) {
@@ -124,20 +130,18 @@ export function deriveEvmAddress(seedPhrase: string): string {
 
 /**
  * Derives a Solana address from a BIP39 seed phrase
+ * Solana uses ed25519 with proper seed derivation
  */
 export function deriveSolanaAddress(seedPhrase: string): string {
   try {
-    // Create HD wallet from mnemonic
-    const hdNode = ethers.HDNodeWallet.fromPhrase(seedPhrase.trim().toLowerCase());
-    // Derive Solana path (remove m/ prefix since we're already at root)
-    const derivedWallet = hdNode.derivePath("44'/501'/0'/0/0");
+    // Convert mnemonic to BIP39 seed
+    const bip39Seed = bip39.mnemonicToSeedSync(seedPhrase.trim().toLowerCase());
     
-    // Solana uses ed25519, so we need to create a keypair from the private key
-    // For simplicity, we'll use the private key bytes directly
-    const privateKey = ethers.getBytes(derivedWallet.privateKey);
+    // For Solana, use bytes 8-40 of the BIP39 seed directly as the ed25519 seed
+    const solanaSeed = bip39Seed.slice(8, 40);
     
-    // Create Solana keypair from the first 32 bytes
-    const keypair = Keypair.fromSeed(privateKey.slice(0, 32));
+    // Create Solana keypair from seed
+    const keypair = Keypair.fromSeed(solanaSeed);
     console.log('🔑 Solana Private Key:', bs58.default.encode(keypair.secretKey));
     return keypair.publicKey.toBase58();
   } catch (error) {
@@ -148,29 +152,38 @@ export function deriveSolanaAddress(seedPhrase: string): string {
 
 /**
  * Derives a TRON address from a BIP39 seed phrase
+ * TRON uses secp256k1 with BIP44 path m/44'/195'/0'/0/0
+ * Address format: keccak256(publicKey)[12:] with 0x41 prefix, then base58check
  */
 export function deriveTronAddress(seedPhrase: string): string {
   try {
-    // Create HD wallet from mnemonic
-    const hdNode = ethers.HDNodeWallet.fromPhrase(seedPhrase.trim().toLowerCase());
-    // Derive TRON path (remove m/ prefix since we're already at root)
-    const derivedWallet = hdNode.derivePath("44'/195'/0'/0/0");
+    // Convert mnemonic to seed
+    const seed = bip39.mnemonicToSeedSync(seedPhrase.trim().toLowerCase());
     
-    // TRON addresses are like Ethereum but with different prefix
-    // For simplicity, we'll use the Ethereum address format but with TRON prefix
-    const ethAddress = derivedWallet.address;
-    // Convert to TRON format (remove 0x, add T prefix, and adjust checksum)
-    const addressBytes = ethers.getBytes(ethAddress);
+    // Create root HD node from seed
+    const root = ethers.HDNodeWallet.fromSeed(seed);
     
-    // TRON address format: T + base58check of the public key hash
-    // For simplicity, create a deterministic TRON-like address
-    const base58Chars = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
-    let tronAddress = 'T';
-    for (let i = 0; i < 33; i++) {
-      const byteIndex = i % 20;
-      const charIndex = addressBytes[byteIndex] % 58;
-      tronAddress += base58Chars[charIndex];
-    }
+    // Derive TRON path
+    const derivedWallet = root.derivePath("44'/195'/0'/0/0");
+    
+    // Get the uncompressed public key
+    const signingKey = new ethers.SigningKey(derivedWallet.privateKey);
+    const pubKeyBytes = ethers.getBytes(signingKey.publicKey);
+    const uncompressedPubKey = pubKeyBytes.slice(1); // Remove 0x04 prefix
+    
+    // Compute keccak256 of the 64-byte public key
+    const keccakHash = ethers.keccak256(uncompressedPubKey);
+    
+    // Take the last 20 bytes
+    const addressBytes = ethers.getBytes(keccakHash).slice(12);
+    
+    // Add TRON prefix (0x41 for mainnet)
+    const tronAddressBytes = new Uint8Array(21);
+    tronAddressBytes[0] = 0x41;
+    tronAddressBytes.set(addressBytes, 1);
+    
+    // Base58Check encode (includes checksum automatically)
+    const tronAddress = bs58check.default.encode(tronAddressBytes);
     
     console.log('🔑 TRON Private Key:', derivedWallet.privateKey);
     return tronAddress;
@@ -182,25 +195,43 @@ export function deriveTronAddress(seedPhrase: string): string {
 
 /**
  * Derives a Bitcoin address from a BIP39 seed phrase
+ * Uses BIP44 path m/44'/0'/0'/0/0 with secp256k1
  */
 export function deriveBitcoinAddress(seedPhrase: string): string {
   try {
-    // Create HD wallet from mnemonic
-    const hdNode = ethers.HDNodeWallet.fromPhrase(seedPhrase.trim().toLowerCase());
-    // Derive Bitcoin path (remove m/ prefix since we're already at root)
-    const derivedWallet = hdNode.derivePath("44'/0'/0'/0/0");
+    // Convert mnemonic to seed
+    const seed = bip39.mnemonicToSeedSync(seedPhrase.trim().toLowerCase());
     
-    // For simplicity, create a deterministic Bitcoin-like address
-    // In production, you'd want proper Bitcoin address derivation
-    const addressBytes = ethers.getBytes(derivedWallet.address);
-    const base58Chars = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+    // Create root HD node from seed
+    const root = ethers.HDNodeWallet.fromSeed(seed);
     
-    let btcAddress = '1'; // Bitcoin addresses start with 1
-    for (let i = 0; i < 25; i++) {
-      const byteIndex = i % 20;
-      const charIndex = addressBytes[byteIndex] % 58;
-      btcAddress += base58Chars[charIndex];
-    }
+    // Derive Bitcoin path
+    const derivedWallet = root.derivePath("44'/0'/0'/0/0");
+    
+    // Get compressed public key
+    const publicKey = ethers.getBytes(derivedWallet.publicKey);
+    
+    // Create Bitcoin address: version byte + ripemd160(sha256(pubkey)) + checksum
+    const sha256Hash = bitcoin.crypto.sha256(publicKey);
+    const ripemd160Hash = bitcoin.crypto.ripemd160(sha256Hash);
+    
+    // Add version byte (0x00 for mainnet)
+    const versionedHash = new Uint8Array(21);
+    versionedHash[0] = 0x00;
+    versionedHash.set(ripemd160Hash, 1);
+    
+    // Calculate checksum: double SHA256 of versionedHash, take first 4 bytes
+    const hash1 = bitcoin.crypto.sha256(versionedHash);
+    const hash2 = bitcoin.crypto.sha256(hash1);
+    const checksum = hash2.slice(0, 4);
+    
+    // Combine versionedHash + checksum
+    const addressBytes = new Uint8Array(25);
+    addressBytes.set(versionedHash, 0);
+    addressBytes.set(checksum, 21);
+    
+    // Base58 encode
+    const btcAddress = bs58.default.encode(addressBytes);
     
     console.log('🔑 Bitcoin Private Key:', derivedWallet.privateKey);
     return btcAddress;
