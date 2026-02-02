@@ -58,11 +58,10 @@ export default function Wallets() {
   const [showImportModal, setShowImportModal] = useState(false);
   const [seedPhrase, setSeedPhrase] = useState('');
   const [walletName, setWalletName] = useState('');
-  const [step, setStep] = useState<'select' | 'import' | 'backup' | 'create'>('select');
+  const [step, setStep] = useState<'select' | 'import' | 'backup'>('select');
   const [generatedSeedPhrase, setGeneratedSeedPhrase] = useState('');
   const [expandedWallet, setExpandedWallet] = useState<string | null>(null);
   const [selectedWalletForTx, setSelectedWalletForTx] = useState<string | null>(null);
-  const [selectedWalletConfig, setSelectedWalletConfig] = useState<typeof walletConfigs[0] | null>(null);
   const [showSendModal, setShowSendModal] = useState(false);
   const [showReceiveModal, setShowReceiveModal] = useState(false);
 
@@ -80,7 +79,7 @@ export default function Wallets() {
   const { wallets: walletsWithAssets, totalPortfolioValue, totalXrpBalance, loading: balancesLoading, refetch: refetchBalances } = useMultiWalletBalances(walletsForBalances);
 
   const handleSelectWallet = (wallet: typeof walletConfigs[0]) => {
-    setSelectedWalletConfig(wallet);
+    setSelectedWallet(wallet);
     setStep('import');
   };
 
@@ -331,33 +330,7 @@ export default function Wallets() {
           </Button>
         </motion.div>
       ) : (
-        <div className="space-y-6">
-          {/* Portfolio Summary */}
-          {walletsWithAssets.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-card rounded-xl border border-border p-6"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold text-foreground">Total Portfolio Value</h3>
-                  <p className="text-sm text-muted-foreground">Across all imported wallets</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-2xl font-bold text-foreground">
-                    {formatUSD(walletsWithAssets.reduce((sum, wallet) => sum + wallet.totalValueUSD, 0))}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    {walletsWithAssets.reduce((sum, wallet) => sum + wallet.tokens.length, 0)} assets
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Wallets List */}
-          <div className="space-y-4">
+        <div className="space-y-4">
           {walletsWithAssets.map((walletAssets, index) => {
             const localWallet = walletStore.importedWallets.find(w => w.id === walletAssets.id);
             const dbWallet = wallets.find(w => w.wallet_address === walletAssets.xrpAddress);
@@ -604,7 +577,6 @@ export default function Wallets() {
               </motion.div>
             );
           })}
-        </div>
         </div>
       )}
 
