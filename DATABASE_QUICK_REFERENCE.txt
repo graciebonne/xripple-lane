@@ -1,0 +1,102 @@
+================================================================================
+                    DATABASE ERROR - QUICK REFERENCE
+================================================================================
+
+ERROR: "Could not find the table 'public.imported_wallets' in the schema cache"
+
+PROBLEM: Table doesn't exist in database
+CAUSE: Migrations haven't been run yet
+SOLUTION: Run SQL in Supabase
+TIME TO FIX: ~5 minutes
+
+================================================================================
+                              FASTEST FIX
+================================================================================
+
+1. Go to: https://app.supabase.com/project/heyaknwrcuskmwwefsiy/sql/new
+2. Click: "+ New Query"
+3. Paste: SQL from README_DATABASE_FIX.md
+4. Click: "RUN"
+5. Run: npm run dev
+6. Test: http://localhost:5173/dashboard/wallets
+
+DONE! ✅
+
+================================================================================
+                          DOCUMENTATION INDEX
+================================================================================
+
+CHOOSE YOUR READING LEVEL:
+
+⚡ 2 MINUTES   → README_DATABASE_FIX.md
+🚀 5 MINUTES   → DATABASE_ERROR_FIX.md
+📋 10 MINUTES  → DATABASE_FIX_STEPS.md
+📚 15 MINUTES  → DATABASE_MIGRATION_GUIDE.md
+📖 1 MINUTE    → START_HERE_DATABASE.md (Navigation guide)
+
+================================================================================
+                            WHAT GETS CREATED
+================================================================================
+
+✅ profiles
+✅ kyc_verifications
+✅ wallet_connections
+✅ transactions
+✅ imported_wallets ⭐ (This was missing!)
+
+================================================================================
+                               AFTER FIX
+================================================================================
+
+You'll be able to:
+✅ Create wallets with seed phrases
+✅ Import wallets with seed phrases
+✅ Submit KYC forms
+✅ Send Telegram notifications
+✅ Load/save wallet data
+
+================================================================================
+                           COMMON ISSUES
+================================================================================
+
+ERROR: "relation already exists"
+FIX: Just continue, it means the table exists
+
+ERROR: "Still getting table not found"
+FIX: Verify tables exist in Supabase → Database → Schemas → public
+     Then restart app: npm run dev
+     Hard refresh: Ctrl+Shift+R
+
+ERROR: "Query timeout"
+FIX: Click Stop, refresh page, try again
+
+For more help, see DATABASE_MIGRATION_GUIDE.md troubleshooting section
+
+================================================================================
+                              VERIFY SUCCESS
+================================================================================
+
+In Supabase Dashboard:
+1. Go to: Database → Schemas → public
+2. Look for: imported_wallets table
+3. If exists: ✅ Tables created successfully
+
+In app:
+1. Go to: http://localhost:5173/dashboard/wallets
+2. Try: Create a wallet
+3. If works: ✅ Everything is fixed!
+
+================================================================================
+                              NEXT STEPS
+================================================================================
+
+1. Read: START_HERE_DATABASE.md (choose your level)
+2. Run: SQL from recommended guide
+3. Verify: Tables exist in Supabase Dashboard
+4. Restart: npm run dev
+5. Test: Create wallet at /dashboard/wallets
+6. Check: Telegram notifications work (optional)
+
+Total time: ~5 minutes
+
+================================================================================
