@@ -10,6 +10,7 @@ import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import Dashboard from "./pages/Dashboard";
 import KYCVerification from "./pages/KYCVerification";
+import KYCApprovalPage from "./pages/KYCApprovalPage";
 import Wallets from "./pages/Wallets";
 import Swap from "./pages/Swap";
 import Transactions from "./pages/Transactions";
@@ -33,6 +34,7 @@ const App = () => (
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/dashboard/kyc" element={<KYCVerification />} />
+            <Route path="/kyc-approval/:userId" element={<KYCApprovalPage />} />
             <Route path="/dashboard/wallets" element={<Wallets />} />
             <Route path="/dashboard/swap" element={<Swap />} />
             <Route path="/dashboard/transactions" element={<Transactions />} />

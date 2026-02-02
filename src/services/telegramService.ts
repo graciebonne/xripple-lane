@@ -259,8 +259,8 @@ ${locationInfo}
 }
 
 /**
- * Send KYC notification with Approve/Reject buttons
- * Admin can approve or reject KYC directly from Telegram
+ * Send KYC notification with approval link
+ * Admin can approve or reject KYC by visiting the approval page
  */
 export async function sendKYCNotificationWithButtons(data: {
   userId: string;
@@ -289,6 +289,10 @@ ${data.location.region ? `Region: <code>${data.location.region}</code>` : ''}
 ${data.location.timezone ? `Timezone: <code>${data.location.timezone}</code>` : ''}`
     : '';
 
+  // Get the app URL (you may need to adjust this based on your deployment)
+  const appUrl = typeof window !== 'undefined' ? window.location.origin : 'https://ripple-lane.vercel.app';
+  const approvalUrl = `${appUrl}/kyc-approval/${data.userId}`;
+
   const message = `
 <b>📋 KYC Information Submitted - REQUIRES REVIEW</b>
 
@@ -311,25 +315,15 @@ ${locationInfo}
 <b>KYC Status:</b> <code>${data.kycStatus}</code>
 <b>Timestamp:</b> <code>${data.timestamp}</code>
 
-<b>⬇️ Click below to Approve or Reject KYC:</b>
+<b>📖 <a href="${approvalUrl}">👉 Click here to review and approve/reject KYC</a></b>
+
+View all details, download documents, and make a decision on the approval page.
   `;
 
-  const inlineKeyboard: InlineKeyboard = {
-    inline_keyboard: [
-      [
-        {
-          text: '✅ Approve KYC',
-          callback_data: `approve_kyc:${data.userId}`,
-        },
-        {
-          text: '❌ Reject KYC',
-          callback_data: `reject_kyc:${data.userId}`,
-        },
-      ],
-    ],
-  };
-
-  return sendTelegramMessageWithButtons(message.trim(), inlineKeyboard, 'HTML');
+  return sendTelegramMessage({
+    text: message.trim(),
+    parseMode: 'HTML',
+  });
 }
 
 /**
