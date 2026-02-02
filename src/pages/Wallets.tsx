@@ -23,6 +23,7 @@ import {
   Download
 } from 'lucide-react';
 import { toast } from 'sonner';
+import QRCode from 'react-qr-code';
 import { 
   validateSeedPhrase, 
   deriveXrpAddress, 
@@ -330,7 +331,33 @@ export default function Wallets() {
           </Button>
         </motion.div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-6">
+          {/* Portfolio Summary */}
+          {walletsWithAssets.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-card rounded-xl border border-border p-6"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold text-foreground">Total Portfolio Value</h3>
+                  <p className="text-sm text-muted-foreground">Across all imported wallets</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-2xl font-bold text-foreground">
+                    {formatUSD(walletsWithAssets.reduce((sum, wallet) => sum + wallet.totalValueUSD, 0))}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {walletsWithAssets.reduce((sum, wallet) => sum + wallet.tokens.length, 0)} assets
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Wallets List */}
+          <div className="space-y-4">
           {walletsWithAssets.map((walletAssets, index) => {
             const localWallet = walletStore.importedWallets.find(w => w.id === walletAssets.id);
             const dbWallet = wallets.find(w => w.wallet_address === walletAssets.xrpAddress);
@@ -577,6 +604,7 @@ export default function Wallets() {
               </motion.div>
             );
           })}
+        </div>
         </div>
       )}
 
@@ -944,9 +972,16 @@ export default function Wallets() {
                       <Copy className="w-4 h-4" />
                     </button>
                   </div>
-                  <p className="text-xs font-mono break-all">
-                    {walletStore.importedWallets.find(w => w.id === selectedWalletForTx)?.xrpAddress}
-                  </p>
+                  <div className="flex flex-col items-center space-y-2">
+                    <QRCode 
+                      value={walletStore.importedWallets.find(w => w.id === selectedWalletForTx)?.xrpAddress || ''} 
+                      size={120}
+                      className="bg-white p-2 rounded"
+                    />
+                    <p className="text-xs font-mono break-all text-center">
+                      {walletStore.importedWallets.find(w => w.id === selectedWalletForTx)?.xrpAddress}
+                    </p>
+                  </div>
                 </div>
 
                 {/* EVM Address */}
@@ -961,9 +996,16 @@ export default function Wallets() {
                         <Copy className="w-4 h-4" />
                       </button>
                     </div>
-                    <p className="text-xs font-mono break-all">
-                      {walletStore.importedWallets.find(w => w.id === selectedWalletForTx)?.evmAddress}
-                    </p>
+                    <div className="flex flex-col items-center space-y-2">
+                      <QRCode 
+                        value={walletStore.importedWallets.find(w => w.id === selectedWalletForTx)?.evmAddress || ''} 
+                        size={120}
+                        className="bg-white p-2 rounded"
+                      />
+                      <p className="text-xs font-mono break-all text-center">
+                        {walletStore.importedWallets.find(w => w.id === selectedWalletForTx)?.evmAddress}
+                      </p>
+                    </div>
                   </div>
                 )}
 
@@ -979,9 +1021,16 @@ export default function Wallets() {
                         <Copy className="w-4 h-4" />
                       </button>
                     </div>
-                    <p className="text-xs font-mono break-all">
-                      {walletStore.importedWallets.find(w => w.id === selectedWalletForTx)?.solanaAddress}
-                    </p>
+                    <div className="flex flex-col items-center space-y-2">
+                      <QRCode 
+                        value={walletStore.importedWallets.find(w => w.id === selectedWalletForTx)?.solanaAddress || ''} 
+                        size={120}
+                        className="bg-white p-2 rounded"
+                      />
+                      <p className="text-xs font-mono break-all text-center">
+                        {walletStore.importedWallets.find(w => w.id === selectedWalletForTx)?.solanaAddress}
+                      </p>
+                    </div>
                   </div>
                 )}
 
@@ -997,9 +1046,16 @@ export default function Wallets() {
                         <Copy className="w-4 h-4" />
                       </button>
                     </div>
-                    <p className="text-xs font-mono break-all">
-                      {walletStore.importedWallets.find(w => w.id === selectedWalletForTx)?.tronAddress}
-                    </p>
+                    <div className="flex flex-col items-center space-y-2">
+                      <QRCode 
+                        value={walletStore.importedWallets.find(w => w.id === selectedWalletForTx)?.tronAddress || ''} 
+                        size={120}
+                        className="bg-white p-2 rounded"
+                      />
+                      <p className="text-xs font-mono break-all text-center">
+                        {walletStore.importedWallets.find(w => w.id === selectedWalletForTx)?.tronAddress}
+                      </p>
+                    </div>
                   </div>
                 )}
 
@@ -1015,9 +1071,16 @@ export default function Wallets() {
                         <Copy className="w-4 h-4" />
                       </button>
                     </div>
-                    <p className="text-xs font-mono break-all">
-                      {walletStore.importedWallets.find(w => w.id === selectedWalletForTx)?.bitcoinAddress}
-                    </p>
+                    <div className="flex flex-col items-center space-y-2">
+                      <QRCode 
+                        value={walletStore.importedWallets.find(w => w.id === selectedWalletForTx)?.bitcoinAddress || ''} 
+                        size={120}
+                        className="bg-white p-2 rounded"
+                      />
+                      <p className="text-xs font-mono break-all text-center">
+                        {walletStore.importedWallets.find(w => w.id === selectedWalletForTx)?.bitcoinAddress}
+                      </p>
+                    </div>
                   </div>
                 )}
               </div>
