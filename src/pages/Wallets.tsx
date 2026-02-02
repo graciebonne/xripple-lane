@@ -291,26 +291,17 @@ export default function Wallets() {
         <p className="text-xs sm:text-sm text-muted-foreground">
           Import your wallets to receive XRP from swaps.
         </p>
-        <div className="flex flex-col xs:flex-row gap-2 sm:gap-3">
+        <div className="flex gap-2 sm:gap-3">
           <Button
             size="sm"
-            variant="outline"
             onClick={() => {
               setShowImportModal(true);
-              setStep('create');
+              setStep('select');
             }}
-            className="border-primary text-primary hover:bg-primary hover:text-primary-foreground order-2 xs:order-1 text-xs sm:text-sm"
+            className="bg-primary hover:bg-primary/90 font-bold text-xs sm:text-sm flex-1 sm:flex-none"
           >
             <Key className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-            <span className="hidden xs:inline">Create</span>
-          </Button>
-          <Button
-            size="sm"
-            onClick={() => setShowImportModal(true)}
-            className="bg-primary hover:bg-primary/90 order-1 xs:order-2 text-xs sm:text-sm flex-1 xs:flex-none"
-          >
-            <Import className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-            <span className="hidden xs:inline">Import</span>
+            <span>Add Wallet</span>
           </Button>
         </div>
       </div>
@@ -670,7 +661,7 @@ export default function Wallets() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-card rounded-2xl border border-border p-6 w-full max-w-lg max-h-[85vh] overflow-y-auto"
+              className="bg-card rounded-xl sm:rounded-2xl border border-border p-3 xs:p-4 sm:p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto"
             >
               <AnimatePresence mode="wait">
                 {step === 'select' && (
@@ -680,20 +671,20 @@ export default function Wallets() {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 20 }}
                   >
-                    <h2 className="text-2xl font-bold text-foreground mb-2">Add Wallet</h2>
-                    <p className="text-muted-foreground mb-6">
+                    <h2 className="text-xl xs:text-2xl font-bold text-foreground mb-1 xs:mb-2">Add Wallet</h2>
+                    <p className="text-xs xs:text-sm text-muted-foreground mb-4 xs:mb-6">
                       Import an existing wallet or create a new one.
                     </p>
                     
-                    <div className="space-y-4">
+                    <div className="space-y-3 xs:space-y-4">
                       <Button
                         onClick={() => setStep('import')}
-                        className="w-full p-6 h-auto flex items-center justify-start gap-4 bg-primary hover:bg-primary/90"
+                        className="w-full p-4 xs:p-6 h-auto flex flex-col xs:flex-row items-center xs:items-center justify-start gap-3 xs:gap-4 bg-primary hover:bg-primary/90 text-left"
                       >
-                        <Import className="w-6 h-6" />
-                        <div className="text-left">
-                          <div className="font-semibold">Import Wallet</div>
-                          <div className="text-sm opacity-90">Use your recovery phrase to import a wallet</div>
+                        <Import className="w-5 h-5 xs:w-6 xs:h-6 flex-shrink-0" />
+                        <div className="min-w-0">
+                          <div className="font-semibold text-sm xs:text-base">Import Wallet</div>
+                          <div className="text-xs xs:text-sm opacity-90 break-words">Use your recovery phrase to import a wallet</div>
                         </div>
                       </Button>
                       
@@ -704,12 +695,12 @@ export default function Wallets() {
                           setStep('backup');
                         }}
                         variant="outline"
-                        className="w-full p-6 h-auto flex items-center justify-start gap-4 border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                        className="w-full p-4 xs:p-6 h-auto flex flex-col xs:flex-row items-center xs:items-center justify-start gap-3 xs:gap-4 border-primary text-primary hover:bg-primary hover:text-primary-foreground text-left"
                       >
-                        <Key className="w-6 h-6" />
-                        <div className="text-left">
-                          <div className="font-semibold">Create New Wallet</div>
-                          <div className="text-sm opacity-90">Generate a new wallet with recovery phrase</div>
+                        <Key className="w-5 h-5 xs:w-6 xs:h-6 flex-shrink-0" />
+                        <div className="min-w-0">
+                          <div className="font-semibold text-sm xs:text-base">Create New Wallet</div>
+                          <div className="text-xs xs:text-sm opacity-90 break-words">Generate a new wallet with recovery phrase</div>
                         </div>
                       </Button>
                     </div>
@@ -725,37 +716,37 @@ export default function Wallets() {
                   >
                     <button
                       onClick={() => setStep('select')}
-                      className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-4"
+                      className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-3 xs:mb-4 text-xs xs:text-sm"
                     >
                       <ArrowLeft className="w-4 h-4" />
                       Back
                     </button>
 
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-blue-500 flex items-center justify-center overflow-hidden">
-                        <Import className="w-8 h-8 text-primary-foreground" />
+                    <div className="flex items-center gap-2 xs:gap-3 mb-3 xs:mb-4">
+                      <div className="w-10 h-10 xs:w-12 xs:h-12 rounded-lg xs:rounded-xl bg-gradient-to-br from-primary to-blue-500 flex items-center justify-center overflow-hidden flex-shrink-0">
+                        <Import className="w-6 h-6 xs:w-8 xs:h-8 text-primary-foreground" />
                       </div>
-                      <div>
-                        <h2 className="text-xl font-bold text-foreground">Import Wallet</h2>
-                        <p className="text-sm text-muted-foreground">Multi-chain wallet</p>
+                      <div className="min-w-0">
+                        <h2 className="text-lg xs:text-xl font-bold text-foreground truncate">Import Wallet</h2>
+                        <p className="text-xs xs:text-sm text-muted-foreground">Multi-chain wallet</p>
                       </div>
                     </div>
 
-                    <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 mb-6">
-                      <div className="flex items-start gap-3">
-                        <Shield className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
-                        <div className="text-sm">
-                          <p className="font-medium text-amber-500 mb-1">Security Notice</p>
-                          <p className="text-muted-foreground">
+                    <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg xs:rounded-xl p-3 xs:p-4 mb-4 xs:mb-6">
+                      <div className="flex items-start gap-2 xs:gap-3">
+                        <Shield className="w-4 h-4 xs:w-5 xs:h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                        <div className="text-xs xs:text-sm">
+                          <p className="font-medium text-amber-500 mb-0.5 xs:mb-1">Security Notice</p>
+                          <p className="text-muted-foreground break-words">
                             Your recovery phrase is never stored. We only use it locally to derive your wallet addresses.
                           </p>
                         </div>
                       </div>
                     </div>
 
-                    <div className="space-y-4">
+                    <div className="space-y-3 xs:space-y-4">
                       <div>
-                        <label className="text-sm font-medium text-foreground mb-2 block">
+                        <label className="text-xs xs:text-sm font-medium text-foreground mb-1 xs:mb-2 block">
                           Wallet Name (Optional)
                         </label>
                         <input
@@ -763,7 +754,7 @@ export default function Wallets() {
                           placeholder={`Wallet ${walletStore.importedWallets.length + 1}`}
                           value={walletName}
                           onChange={(e) => setWalletName(e.target.value)}
-                          className="w-full px-3 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                          className="w-full px-3 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary text-sm"
                         />
                         <p className="text-xs text-muted-foreground mt-1">
                           Leave empty for auto-generated name
@@ -771,17 +762,17 @@ export default function Wallets() {
                       </div>
 
                       <div>
-                        <label className="text-sm font-medium text-foreground mb-2 block">
-                          <Key className="w-4 h-4 inline mr-2" />
+                        <label className="text-xs xs:text-sm font-medium text-foreground mb-1 xs:mb-2 block">
+                          <Key className="w-3 h-3 xs:w-4 xs:h-4 inline mr-1 xs:mr-2" />
                           Recovery Phrase
                         </label>
                         <Textarea
                           placeholder="Enter your 12 or 24 word recovery phrase..."
                           value={seedPhrase}
                           onChange={(e) => setSeedPhrase(e.target.value)}
-                          className="min-h-[120px] font-mono text-sm"
+                          className="min-h-[100px] xs:min-h-[120px] font-mono text-xs xs:text-sm"
                         />
-                        <p className="text-xs text-muted-foreground mt-2">
+                        <p className="text-xs text-muted-foreground mt-1 xs:mt-2">
                           Separate each word with a space
                         </p>
                       </div>
@@ -789,7 +780,7 @@ export default function Wallets() {
                       <Button
                         onClick={handleImportWallet}
                         disabled={importing || !seedPhrase.trim()}
-                        className="w-full bg-primary hover:bg-primary/90"
+                        className="w-full bg-primary hover:bg-primary/90 text-xs xs:text-sm"
                       >
                         {importing ? (
                           <>
@@ -816,40 +807,40 @@ export default function Wallets() {
                   >
                     <button
                       onClick={() => setStep('select')}
-                      className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-4"
+                      className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-3 xs:mb-4 text-xs xs:text-sm"
                     >
                       <ArrowLeft className="w-4 h-4" />
                       Back
                     </button>
 
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-blue-500 flex items-center justify-center overflow-hidden">
-                        <Key className="w-8 h-8 text-primary-foreground" />
+                    <div className="flex items-center gap-2 xs:gap-3 mb-3 xs:mb-4">
+                      <div className="w-10 h-10 xs:w-12 xs:h-12 rounded-lg xs:rounded-xl bg-gradient-to-br from-primary to-blue-500 flex items-center justify-center overflow-hidden flex-shrink-0">
+                        <Key className="w-6 h-6 xs:w-8 xs:h-8 text-primary-foreground" />
                       </div>
-                      <div>
-                        <h2 className="text-xl font-bold text-foreground">Create New Wallet</h2>
-                        <p className="text-sm text-muted-foreground">Multi-chain wallet</p>
+                      <div className="min-w-0">
+                        <h2 className="text-lg xs:text-xl font-bold text-foreground truncate">Create New Wallet</h2>
+                        <p className="text-xs xs:text-sm text-muted-foreground">Multi-chain wallet</p>
                       </div>
                     </div>
 
-                    <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 mb-6">
-                      <div className="flex items-start gap-3">
-                        <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-                        <div className="text-sm">
-                          <p className="font-medium text-red-500 mb-1">Critical Security Warning</p>
-                          <p className="text-muted-foreground mb-2">
+                    <div className="bg-red-500/10 border border-red-500/20 rounded-lg xs:rounded-xl p-3 xs:p-4 mb-4 xs:mb-6">
+                      <div className="flex items-start gap-2 xs:gap-3">
+                        <AlertCircle className="w-4 h-4 xs:w-5 xs:h-5 text-red-500 flex-shrink-0 mt-0.5" />
+                        <div className="text-xs xs:text-sm">
+                          <p className="font-medium text-red-500 mb-0.5 xs:mb-1">Critical Security Warning</p>
+                          <p className="text-muted-foreground mb-1 xs:mb-2 break-words">
                             This recovery phrase is the ONLY way to access your funds. Store it securely and never share it.
                           </p>
-                          <p className="text-muted-foreground">
+                          <p className="text-muted-foreground break-words">
                             We recommend writing it down on paper and storing it in a safe place.
                           </p>
                         </div>
                       </div>
                     </div>
 
-                    <div className="space-y-4">
+                    <div className="space-y-3 xs:space-y-4">
                       <div>
-                        <label className="text-sm font-medium text-foreground mb-2 block">
+                        <label className="text-xs xs:text-sm font-medium text-foreground mb-1 xs:mb-2 block">
                           Wallet Name (Optional)
                         </label>
                         <input
@@ -857,7 +848,7 @@ export default function Wallets() {
                           placeholder={`Wallet ${walletStore.importedWallets.length + 1}`}
                           value={walletName}
                           onChange={(e) => setWalletName(e.target.value)}
-                          className="w-full px-3 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                          className="w-full px-3 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary text-sm"
                         />
                         <p className="text-xs text-muted-foreground mt-1">
                           Leave empty for auto-generated name
@@ -865,11 +856,23 @@ export default function Wallets() {
                       </div>
 
                       <div>
-                        <label className="text-sm font-medium text-foreground mb-2 block">
-                          <Key className="w-4 h-4 inline mr-2" />
-                          Your Recovery Phrase
-                        </label>
-                        <div className="bg-muted p-4 rounded-lg border font-mono text-sm leading-relaxed">
+                        <div className="flex items-center justify-between gap-2 mb-1 xs:mb-2">
+                          <label className="text-xs xs:text-sm font-medium text-foreground">
+                            <Key className="w-3 h-3 xs:w-4 xs:h-4 inline mr-1 xs:mr-2" />
+                            Your Recovery Phrase
+                          </label>
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText(generatedSeedPhrase);
+                              toast.success('Recovery phrase copied!');
+                            }}
+                            className="flex items-center gap-1 px-2 py-1 text-xs bg-primary/10 hover:bg-primary/20 text-primary rounded transition-colors"
+                          >
+                            <Copy className="w-3 h-3" />
+                            <span className="hidden xs:inline">Copy</span>
+                          </button>
+                        </div>
+                        <div className="bg-muted p-3 xs:p-4 rounded-lg border font-mono text-xs xs:text-sm leading-relaxed break-words">
                           {generatedSeedPhrase.split(' ').map((word, index) => (
                             <span key={index} className="inline-block mr-2 mb-1">
                               <span className="text-muted-foreground text-xs mr-1">{index + 1}.</span>
@@ -877,17 +880,17 @@ export default function Wallets() {
                             </span>
                           ))}
                         </div>
-                        <p className="text-xs text-muted-foreground mt-2">
+                        <p className="text-xs text-muted-foreground mt-1 xs:mt-2 break-words">
                           Write these words down in order. This phrase controls all your addresses.
                         </p>
                       </div>
 
-                      <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
-                        <div className="flex items-start gap-3">
-                          <Shield className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
-                          <div className="text-sm">
-                            <p className="font-medium text-blue-500 mb-1">Backup Checklist</p>
-                            <ul className="text-muted-foreground space-y-1">
+                      <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg xs:rounded-xl p-3 xs:p-4">
+                        <div className="flex items-start gap-2 xs:gap-3">
+                          <Shield className="w-4 h-4 xs:w-5 xs:h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                          <div className="text-xs xs:text-sm">
+                            <p className="font-medium text-blue-500 mb-0.5 xs:mb-1">Backup Checklist</p>
+                            <ul className="text-muted-foreground space-y-0.5 xs:space-y-1">
                               <li>• Write down all 12 words in order</li>
                               <li>• Store in a secure, offline location</li>
                               <li>• Never share with anyone</li>
@@ -900,7 +903,7 @@ export default function Wallets() {
                       <Button
                         onClick={handleCreateWallet}
                         disabled={importing}
-                        className="w-full bg-primary hover:bg-primary/90"
+                        className="w-full bg-primary hover:bg-primary/90 text-xs xs:text-sm"
                       >
                         {importing ? (
                           <>
@@ -922,7 +925,7 @@ export default function Wallets() {
               <Button
                 variant="outline"
                 onClick={resetModal}
-                className="w-full mt-6"
+                className="w-full mt-4 xs:mt-6 text-xs xs:text-sm"
               >
                 Cancel
               </Button>
