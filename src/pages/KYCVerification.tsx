@@ -18,6 +18,7 @@ import {
   Loader2
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 import { 
   sendKYCNotification,
   sendKYCNotificationWithButtons,
@@ -144,8 +145,15 @@ export default function KYCVerification() {
       // Get user's geolocation
       const location = await getFullGeolocationData();
 
-      // Get current user ID for Telegram notification
-      const userId = kycData?.user_id || 'unknown';
+      // Get the actual auth user ID from Supabase
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      const userId = authUser?.id;
+
+      if (!userId) {
+        toast.error('User not authenticated');
+        setSubmitting(false);
+        return;
+      }
 
       // Send KYC information to Telegram with buttons for admin approval
       if (personalInfo && addressInfo) {
