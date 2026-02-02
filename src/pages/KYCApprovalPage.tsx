@@ -48,6 +48,7 @@ export default function KYCApprovalPage() {
 
       try {
         // Fetch KYC verification data
+        // Using unauthenticated client since this is a public approval page
         const { data: kycRecord, error: kycError } = await supabase
           .from('kyc_verifications')
           .select('*')
@@ -58,14 +59,7 @@ export default function KYCApprovalPage() {
           console.error('KYC Fetch Error:', kycError);
           console.error('User ID searched:', userId);
           
-          // Try to provide more debug info
-          const { data: allRecords } = await supabase
-            .from('kyc_verifications')
-            .select('user_id')
-            .limit(5);
-          console.log('Sample user IDs in database:', allRecords?.map(r => r.user_id));
-          
-          toast.error(`KYC record not found for user: ${userId}`);
+          toast.error(`KYC record not found. Please check the link.`);
           navigate('/');
           return;
         }
@@ -79,12 +73,16 @@ export default function KYCApprovalPage() {
         setKycData(kycRecord);
 
         // Fetch user documents
-        const { data: docData, error: docError } = await supabase.storage
-          .from('kyc-documents')
-          .list(`${userId}/`);
+        try {
+          const { data: docData, error: docError } = await supabase.storage
+            .from('kyc-documents')
+            .list(`${userId}/`);
 
-        if (!docError && docData) {
-          setDocuments(docData);
+          if (!docError && docData) {
+            setDocuments(docData);
+          }
+        } catch (docErr) {
+          console.log('Documents not available');
         }
       } catch (error) {
         console.error('Error fetching KYC data:', error);
