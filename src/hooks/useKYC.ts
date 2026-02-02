@@ -74,12 +74,40 @@ export function useKYC() {
         Object.assign(updateData, data);
       }
 
-      const { error } = await supabase
+      // First, try to update existing record
+      const { data: existingData, error: fetchError } = await supabase
         .from('kyc_verifications')
-        .update(updateData)
-        .eq('user_id', user.id);
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
 
-      if (error) throw error;
+      if (fetchError && fetchError.code !== 'PGRST116') {
+        // PGRST116 means no rows found, which is fine
+        throw fetchError;
+      }
+
+      if (!existingData) {
+        // Record doesn't exist, create it
+        const { error: insertError } = await supabase
+          .from('kyc_verifications')
+          .insert({
+            user_id: user.id,
+            status: 'not_started',
+            kyc_step: step,
+            ...updateData,
+          });
+
+        if (insertError) throw insertError;
+      } else {
+        // Record exists, update it
+        const { error: updateError } = await supabase
+          .from('kyc_verifications')
+          .update(updateData)
+          .eq('user_id', user.id);
+
+        if (updateError) throw updateError;
+      }
+
       await fetchKYC();
       return { success: true };
     } catch (err: any) {
