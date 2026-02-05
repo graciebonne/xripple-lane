@@ -159,7 +159,7 @@ export default function BonusBanner({ trigger = 'session' }: BonusBannerProps) {
                     transition={{ delay: 0.6 }}
                     className="text-white/60 text-sm sm:text-base mb-5 leading-relaxed"
                   >
-                    Earn <span className="text-primary font-semibold">35% extra XRP</span> on all purchases and swaps. 
+                    Earn <span className="text-primary font-semibold">35% extra XRP</span> on all swaps. 
                     The more you trade, the more you earn!
                   </motion.p>
 
@@ -171,7 +171,7 @@ export default function BonusBanner({ trigger = 'session' }: BonusBannerProps) {
                     className="space-y-3"
                   >
                     <Button
-                      onClick={() => handleNavigate('/dashboard/buy')}
+                      onClick={() => handleNavigate('/dashboard/swap')}
                       className="w-full btn-xrp-primary py-4 sm:py-5 text-base group"
                     >
                       Start Earning Now
