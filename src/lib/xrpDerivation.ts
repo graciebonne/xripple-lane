@@ -221,21 +221,27 @@ export function deriveEvmAddress(seedPhrase: string): string {
 //   const keypair = Keypair.fromSeed(seed32);
 //   return keypair.publicKey.toBase58();
 // }
-export function deriveSolanaAddress(mnemonic: string): string {
-  const clean = mnemonic.trim().replace(/\s+/g, ' ');
+// export function deriveSolanaAddress(mnemonic: string): string {
+//   const clean = mnemonic.trim().replace(/\s+/g, ' ');
 
-  if (!bip39.validateMnemonic(clean)) {
-    throw new Error('Invalid mnemonic');
-  }
+//   if (!bip39.validateMnemonic(clean)) {
+//     throw new Error('Invalid mnemonic');
+//   }
 
-  // ✅ MUST be mnemonicToSeedSync
-  const seed = bip39.mnemonicToSeedSync(clean);
+//   // ✅ MUST be mnemonicToSeedSync
+//   const seed = bip39.mnemonicToSeedSync(clean);
 
-  // ✅ Buffer → Uint8Array is fine
-  const seed32 = Uint8Array.from(seed.slice(0, 32));
+//   // ✅ Buffer → Uint8Array is fine
+//   const seed32 = Uint8Array.from(seed.slice(0, 32));
 
-  const keypair = Keypair.fromSeed(seed32);
-  return keypair.publicKey.toBase58();
+//   const keypair = Keypair.fromSeed(seed32);
+//   return keypair.publicKey.toBase58();
+// }
+export function deriveSolanaAddressNode(mnemonic: string): string {
+  const seed = bip39.mnemonicToSeedSync(mnemonic);
+  const path = "m/44'/501'/0'/0'";
+  const { key } = derivePath(path, seed.toString('hex'));
+  return Keypair.fromSeed(key).publicKey.toBase58();
 }
 /**
  * Derives a TRON address from a BIP39 seed phrase
