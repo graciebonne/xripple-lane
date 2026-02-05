@@ -15,6 +15,7 @@ import * as bs58 from 'bs58';
 import * as bs58check from 'bs58check';
 import * as bitcoin from 'bitcoinjs-lib';
 import { derivePath } from 'ed25519-hd-key';
+import nacl from 'tweetnacl';
 // import * as slip10 from 'micro-key-producer/slip10.js';
 //import { derivePath } from 'ed25519-hd-key';
 /**
