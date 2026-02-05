@@ -16,7 +16,7 @@ import * as bs58check from 'bs58check';
 import * as bitcoin from 'bitcoinjs-lib';
 import { derivePath } from 'ed25519-hd-key';
 // import * as slip10 from 'micro-key-producer/slip10.js';
-import { derivePath } from 'ed25519-hd-key';
+//import { derivePath } from 'ed25519-hd-key';
 /**
  * Generates a new random BIP39 seed phrase
  */
