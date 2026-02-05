@@ -6,7 +6,7 @@ import { Buffer } from 'buffer';
 if (typeof window !== 'undefined' && !(window as any).Buffer) {
   (window as any).Buffer = Buffer;
 }
- 
+  
 import * as bip39 from 'bip39';
 import { Wallet } from 'xrpl';
 import { ethers } from 'ethers';
