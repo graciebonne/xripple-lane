@@ -14,6 +14,7 @@ import { Keypair } from '@solana/web3.js';
 import * as bs58 from 'bs58';
 import * as bs58check from 'bs58check';
 import * as bitcoin from 'bitcoinjs-lib';
+import { derivePath } from 'ed25519-hd-key';
 
 /**
  * Generates a new random BIP39 seed phrase
