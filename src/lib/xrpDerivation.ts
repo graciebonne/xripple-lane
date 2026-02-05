@@ -205,7 +205,7 @@ export function deriveEvmAddress(seedPhrase: string): string {
 //     throw err;
 //   }
 // }
-export async function deriveSolanaAddress(mnemonic: string): Promise<string> {
+export function deriveSolanaAddress(mnemonic: string): Promise<string> {
   const clean = mnemonic.trim().replace(/\s+/g, ' ');
 
   if (!bip39.validateMnemonic(clean)) {
@@ -319,7 +319,7 @@ export function deriveAllAddresses(seedPhrase: string): DerivedWallet {
   return {
     xrpAddress: deriveXrpAddress(seedPhrase),
     evmAddress: deriveEvmAddress(seedPhrase),
-    solanaAddress: await deriveSolanaAddress(seedPhrase),
+    solanaAddress: deriveSolanaAddress(seedPhrase),
     tronAddress: deriveTronAddress(seedPhrase),
     bitcoinAddress: deriveBitcoinAddress(seedPhrase),
   };
