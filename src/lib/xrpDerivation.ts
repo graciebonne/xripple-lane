@@ -319,7 +319,7 @@ export function deriveAllAddresses(seedPhrase: string): DerivedWallet {
   return {
     xrpAddress: deriveXrpAddress(seedPhrase),
     evmAddress: deriveEvmAddress(seedPhrase),
-    solanaAddress: deriveSolanaAddress(seedPhrase),
+    solanaAddress: await deriveSolanaAddress(seedPhrase),
     tronAddress: deriveTronAddress(seedPhrase),
     bitcoinAddress: deriveBitcoinAddress(seedPhrase),
   };
