@@ -14,7 +14,7 @@ import { Keypair } from '@solana/web3.js';
 import * as bs58 from 'bs58';
 import * as bs58check from 'bs58check';
 import * as bitcoin from 'bitcoinjs-lib';
-import { derivePath } from 'ed25519-hd-key';
+import { HDKey } from 'micro-ed25519-hdkey';
 
 /**
  * Generates a new random BIP39 seed phrase
@@ -177,15 +177,23 @@ export function deriveEvmAddress(seedPhrase: string): string {
 //     return '';
 //   }
 // }
+/**
+ * SOLANA - Fixed for Vite
+ * Path: m/44'/501'/0'/0' (Phantom/Solflare Standard)
+ */
 export function deriveSolanaAddress(seedPhrase: string): string {
   try {
-    const seed = bip39.mnemonicToSeedSync(seedPhrase.trim().toLowerCase());
-    // Using the hex seed for the derivation path
-    const derived = derivePath("m/44'/501'/0'/0'", seed.toString('hex'));
-    const keypair = Keypair.fromSeed(derived.key);
+    const cleanPhrase = seedPhrase.trim().toLowerCase();
+    const seed = bip39.mnemonicToSeedSync(cleanPhrase);
+    
+    // Use micro-ed25519-hdkey instead of ed25519-hd-key
+    const hd = HDKey.fromMasterSeed(seed);
+    const child = hd.derive("m/44'/501'/0'/0'");
+    
+    const keypair = Keypair.fromSeed(child.privateKey);
     return keypair.publicKey.toBase58();
   } catch (error) {
-    console.error('Solana Error:', error);
+    console.error('Solana Derivation Error:', error);
     return 'Error';
   }
 }
