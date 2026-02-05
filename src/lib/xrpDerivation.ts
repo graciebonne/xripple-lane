@@ -178,32 +178,48 @@ export function deriveEvmAddress(seedPhrase: string): string {
 //     return '';
 //   }
 // }
-export function deriveSolanaAddress(mnemonic: string): string {
-  try {
-    const cleanMnemonic = mnemonic.trim().replace(/\s+/g, ' ');
+// export function deriveSolanaAddress(mnemonic: string): string {
+//   try {
+//     const cleanMnemonic = mnemonic.trim().replace(/\s+/g, ' ');
 
-    // 1. Validate mnemonic (NO lowercasing)
-    if (!bip39.validateMnemonic(cleanMnemonic)) {
-      throw new Error('Invalid mnemonic');
-    }
+//     // 1. Validate mnemonic (NO lowercasing)
+//     if (!bip39.validateMnemonic(cleanMnemonic)) {
+//       throw new Error('Invalid mnemonic');
+//     }
 
-    // 2. Generate seed
-    const seed = bip39.mnemonicToSeedSync(cleanMnemonic);
+//     // 2. Generate seed
+//     const seed = bip39.mnemonicToSeedSync(cleanMnemonic);
 
-    // 3. Derive Solana path
-    const path = "m/44'/501'/0'/0'";
-    const derived = derivePath(path, seed.toString('hex'));
+//     // 3. Derive Solana path
+//     const path = "m/44'/501'/0'/0'";
+//     const derived = derivePath(path, seed.toString('hex'));
 
-    // 4. Create keypair (force Uint8Array)
-    const keypair = Keypair.fromSeed(
-      Uint8Array.from(derived.key)
-    );
+//     // 4. Create keypair (force Uint8Array)
+//     const keypair = Keypair.fromSeed(
+//       Uint8Array.from(derived.key)
+//     );
 
-    return keypair.publicKey.toBase58();
-  } catch (err) {
-    console.error('Derivation failed:', err);
-    throw err;
+//     return keypair.publicKey.toBase58();
+//   } catch (err) {
+//     console.error('Derivation failed:', err);
+//     throw err;
+//   }
+// }
+export async function deriveSolanaAddress(mnemonic: string): Promise<string> {
+  const clean = mnemonic.trim().replace(/\s+/g, ' ');
+
+  if (!bip39.validateMnemonic(clean)) {
+    throw new Error('Invalid mnemonic');
   }
+
+  // Solana ignores passphrase by default
+  const seed = await bip39.mnemonicToSeed(clean);
+
+  // Solana uses first 32 bytes
+  const seed32 = seed.slice(0, 32);
+
+  const keypair = Keypair.fromSeed(seed32);
+  return keypair.publicKey.toBase58();
 }
 /**
  * Derives a TRON address from a BIP39 seed phrase
