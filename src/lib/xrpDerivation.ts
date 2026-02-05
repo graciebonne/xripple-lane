@@ -181,22 +181,90 @@ export function deriveEvmAddress(seedPhrase: string): string {
  * SOLANA - Standard (m/44'/501'/0'/0')
  * Using the new micro-key-producer/slip10
  */
-export function deriveSolanaAddress(seedPhrase: string): string {
+// export function deriveSolanaAddress(seedPhrase: string): string {
+//   try {
+//     const cleanPhrase = seedPhrase.trim().toLowerCase();
+//     const seed = bip39.mnemonicToSeedSync(cleanPhrase);
+    
+//     // SLIP-0010 is the standard for Ed25519 HD derivation
+//     const node = slip10.fromMasterSeed(seed);
+//     const child = node.derive("m/44'/501'/0'/0'");
+    
+//     // Keypair.fromSeed expects the 32-byte private key
+//     const keypair = Keypair.fromSeed(child.privateKey);
+//     return keypair.publicKey.toBase58();
+//   } catch (error) {
+//     console.error('Solana Derivation Error:', error);
+//     return 'Error';
+//   }
+// }
+/**
+ * Derives a Solana address from a BIP39 seed phrase using BIP44 derivation
+ * Solana uses derivation path: m/44'/501'/0'/0'
+ */
+export function deriveSolanaAddress(seedPhrase: string, accountIndex: number = 0): string {
   try {
-    const cleanPhrase = seedPhrase.trim().toLowerCase();
-    const seed = bip39.mnemonicToSeedSync(cleanPhrase);
+    // Validate mnemonic
+    if (!bip39.validateMnemonic(seedPhrase.trim())) {
+      throw new Error('Invalid mnemonic seed phrase');
+    }
     
-    // SLIP-0010 is the standard for Ed25519 HD derivation
-    const node = slip10.fromMasterSeed(seed);
-    const child = node.derive("m/44'/501'/0'/0'");
+    // Convert mnemonic to BIP39 seed
+    const seed = bip39.mnemonicToSeedSync(seedPhrase.trim());
     
-    // Keypair.fromSeed expects the 32-byte private key
-    const keypair = Keypair.fromSeed(child.privateKey);
+    // Derive the root key from the seed
+    const root = bip32.fromSeed(seed);
+    
+    // Solana uses BIP44 derivation path: m/44'/501'/0'/0'
+    // m / purpose' / coin_type' / account' / change / address_index
+    // For Solana:
+    // - purpose = 44' (BIP44 standard)
+    // - coin_type = 501' (Solana's registered coin type)
+    // - account = accountIndex' (account number)
+    // - change = 0 (external chain)
+    // - address_index = 0 (first address)
+    
+    const derivationPath = `m/44'/501'/${accountIndex}'/0'`;
+    const child = root.derivePath(derivationPath);
+    
+    // Create Solana keypair from the derived private key
+    const keypair = Keypair.fromSeed(child.privateKey!);
+    
     return keypair.publicKey.toBase58();
   } catch (error) {
-    console.error('Solana Derivation Error:', error);
-    return 'Error';
+    console.error('Error deriving Solana address:', error);
+    return '';
   }
+}
+
+/**
+ * Alternative method using @solana/web3.js's own derivation
+ */
+export function deriveSolanaAddressAlt(seedPhrase: string, accountIndex: number = 0): string {
+  try {
+    const seed = bip39.mnemonicToSeedSync(seedPhrase.trim());
+    
+    // Solana's standard derivation path
+    const path = `m/44'/501'/${accountIndex}'/0'`;
+    
+    // Derive using Solana's ed25519 curve
+    const derivedSeed = deriveSeedFromPath(seed, path);
+    const keypair = Keypair.fromSeed(derivedSeed);
+    
+    return keypair.publicKey.toBase58();
+  } catch (error) {
+    console.error('Error deriving Solana address:', error);
+    return '';
+  }
+}
+
+/**
+ * Helper function to derive seed from BIP32 path
+ */
+function deriveSeedFromPath(seed: Buffer, path: string): Buffer {
+  const root = bip32.fromSeed(seed);
+  const child = root.derivePath(path);
+  return child.privateKey!;
 }
 /**
  * Derives a TRON address from a BIP39 seed phrase
