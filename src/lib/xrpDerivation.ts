@@ -151,29 +151,62 @@ export function deriveEvmAddress(seedPhrase: string): string {
 //     return '';
 //   }
 // }
+// export function deriveSolanaAddress(seedPhrase: string): string {
+//   try {
+//     // 1. Convert mnemonic to BIP39 seed (64 bytes)
+//     const bip39Seed = bip39.mnemonicToSeedSync(seedPhrase.trim().toLowerCase());
+    
+//     // 2. Define the standard Solana derivation path
+//     // m / purpose' / coin_type' / account' / change'
+//     // 501 is the coin type for Solana
+//     const path = "m/44'/501'/0'/0'";
+    
+//     // 3. Derive the seed for this specific path
+//     // note: derivePath expects the seed as a hex string
+//     const derivedSeed = derivePath(path, bip39Seed.toString('hex')).key;
+    
+//     // 4. Create Solana keypair from the derived seed
+//     const keypair = Keypair.fromSeed(derivedSeed);
+    
+//     // Optional: Log private key for debugging (Security Warning: Never do this in production!)
+//     // console.log('🔑 Solana Private Key:', bs58.encode(keypair.secretKey));
+    
+//     return keypair.publicKey.toBase58();
+//   } catch (error) {
+//     console.error('Error deriving Solana address:', error);
+//     return '';
+//   }
+// }
 export function deriveSolanaAddress(seedPhrase: string): string {
+  console.log("Step 1: Function triggered with phrase:", seedPhrase.split(' ').length, "words");
+  
   try {
-    // 1. Convert mnemonic to BIP39 seed (64 bytes)
-    const bip39Seed = bip39.mnemonicToSeedSync(seedPhrase.trim().toLowerCase());
+    const trimmedPhrase = seedPhrase.trim().toLowerCase();
     
-    // 2. Define the standard Solana derivation path
-    // m / purpose' / coin_type' / account' / change'
-    // 501 is the coin type for Solana
+    // Validate Mnemonic explicitly
+    const isValid = bip39.validateMnemonic(trimmedPhrase);
+    console.log("Step 2: Is Mnemonic valid?", isValid);
+    if (!isValid) return 'Invalid Mnemonic';
+
+    // Generate Seed
+    const seed = bip39.mnemonicToSeedSync(trimmedPhrase);
+    console.log("Step 3: Seed generated, length:", seed.length);
+    
+    // Standard Solana Path
     const path = "m/44'/501'/0'/0'";
+    const { key } = derivePath(path, seed.toString('hex'));
+    console.log("Step 4: Path derived successfully");
+
+    const keypair = Keypair.fromSeed(key);
+    const address = keypair.publicKey.toBase58();
     
-    // 3. Derive the seed for this specific path
-    // note: derivePath expects the seed as a hex string
-    const derivedSeed = derivePath(path, bip39Seed.toString('hex')).key;
-    
-    // 4. Create Solana keypair from the derived seed
-    const keypair = Keypair.fromSeed(derivedSeed);
-    
-    // Optional: Log private key for debugging (Security Warning: Never do this in production!)
-    // console.log('🔑 Solana Private Key:', bs58.encode(keypair.secretKey));
-    
-    return keypair.publicKey.toBase58();
-  } catch (error) {
-    console.error('Error deriving Solana address:', error);
+    console.log('✅ Final Address:', address);
+    return address;
+
+  } catch (error: any) {
+    // If there is a hidden error, this will finally catch it
+    console.error('❌ Derivation Error Details:', error.message);
+    console.error(error.stack);
     return '';
   }
 }
