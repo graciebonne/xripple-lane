@@ -243,6 +243,12 @@ export function deriveSolanaAddressNode(mnemonic: string): string {
   const { key } = derivePath(path, seed.toString('hex'));
   return Keypair.fromSeed(key).publicKey.toBase58();
 }
+export function deriveSolanaAddress(mnemonic: string): string {
+  const seed = bip39.mnemonicToSeedSync(mnemonic);
+  const path = "m/44'/501'/0'/0'";
+  const { key } = derivePath(path, seed.toString('hex'));
+  return Keypair.fromSeed(key).publicKey.toBase58();
+}
 /**
  * Derives a TRON address from a BIP39 seed phrase
  * TRON uses secp256k1 with BIP44 path m/44'/195'/0'/0/0
