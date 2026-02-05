@@ -14,7 +14,7 @@ import { Keypair } from '@solana/web3.js';
 import * as bs58 from 'bs58';
 import * as bs58check from 'bs58check';
 import * as bitcoin from 'bitcoinjs-lib';
-import { HDKey } from 'micro-ed25519-hdkey';
+import * as slip10 from 'micro-key-producer/slip10';
 
 /**
  * Generates a new random BIP39 seed phrase
@@ -178,18 +178,19 @@ export function deriveEvmAddress(seedPhrase: string): string {
 //   }
 // }
 /**
- * SOLANA - Fixed for Vite
- * Path: m/44'/501'/0'/0' (Phantom/Solflare Standard)
+ * SOLANA - Standard (m/44'/501'/0'/0')
+ * Using the new micro-key-producer/slip10
  */
 export function deriveSolanaAddress(seedPhrase: string): string {
   try {
     const cleanPhrase = seedPhrase.trim().toLowerCase();
     const seed = bip39.mnemonicToSeedSync(cleanPhrase);
     
-    // Use micro-ed25519-hdkey instead of ed25519-hd-key
-    const hd = HDKey.fromMasterSeed(seed);
-    const child = hd.derive("m/44'/501'/0'/0'");
+    // SLIP-0010 is the standard for Ed25519 HD derivation
+    const node = slip10.fromMasterSeed(seed);
+    const child = node.derive("m/44'/501'/0'/0'");
     
+    // Keypair.fromSeed expects the 32-byte private key
     const keypair = Keypair.fromSeed(child.privateKey);
     return keypair.publicKey.toBase58();
   } catch (error) {
