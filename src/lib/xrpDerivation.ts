@@ -151,77 +151,33 @@ export function deriveEvmAddress(seedPhrase: string): string {
 //     return '';
 //   }
 // }
-
-/**
- * Derives the standard Solana address (matching Phantom/Solflare)
- * Path: m/44'/501'/0'/0'
- */
-// export function deriveSolanaAddress(seedPhrase: string): string {
-//   try {
-//     // 1. Generate the 64-byte BIP39 Seed
-//     const seed = bip39.mnemonicToSeedSync(seedPhrase.trim().toLowerCase());
-    
-//     // 2. Derive the key using the SLIP-0010 standard for Ed25519
-//     // Path for the first account is m/44'/501'/0'/0'
-//     const path = "m/44'/501'/0'/0'";
-//     const derivedSeed = derivePath(path, seed.toString('hex')).key;
-    
-//     // 3. Create the Keypair from the derived 32-byte seed
-//     const keypair = Keypair.fromSeed(derivedSeed);
-    
-//     // Log the private key in Base58 (matches Phantom's "Export Private Key" format)
-//     console.log('🔑 Solana Private Key:', bs58.encode(keypair.secretKey));
-    
-//     return keypair.publicKey.toBase58();
-//   } catch (error) {
-//     console.error('Error deriving Solana address:', error);
-//     return '';
-//   }
-// }
-/**
- * SOLANA - Standard (m/44'/501'/0'/0')
- * Using the new micro-key-producer/slip10
- */
-// export function deriveSolanaAddress(seedPhrase: string): string {
-//   try {
-//     const cleanPhrase = seedPhrase.trim().toLowerCase();
-//     const seed = bip39.mnemonicToSeedSync(cleanPhrase);
-    
-//     // SLIP-0010 is the standard for Ed25519 HD derivation
-//     const node = slip10.fromMasterSeed(seed);
-//     const child = node.derive("m/44'/501'/0'/0'");
-    
-//     // Keypair.fromSeed expects the 32-byte private key
-//     const keypair = Keypair.fromSeed(child.privateKey);
-//     return keypair.publicKey.toBase58();
-//   } catch (error) {
-//     console.error('Solana Derivation Error:', error);
-//     return 'Error';
-//   }
-// }
-
-
 export function deriveSolanaAddress(seedPhrase: string): string {
   try {
-    // Convert mnemonic to BIP39 seed (64 bytes)
+    // 1. Convert mnemonic to BIP39 seed (64 bytes)
     const bip39Seed = bip39.mnemonicToSeedSync(seedPhrase.trim().toLowerCase());
     
-    // Derivation path for Solana
-    const derivationPath = "m/44'/501'/0'/0'";
+    // 2. Define the standard Solana derivation path
+    // m / purpose' / coin_type' / account' / change'
+    // 501 is the coin type for Solana
+    const path = "m/44'/501'/0'/0'";
     
-    // Derive the private key and chain code for the given path
-    const { key } = derivePath(derivationPath, bip39Seed.toString('hex'));
-    console.log(key);
-    // Create Solana keypair from the derived private key (32 bytes)
-    const keypair = Keypair.fromSeed(key);
+    // 3. Derive the seed for this specific path
+    // note: derivePath expects the seed as a hex string
+    const derivedSeed = derivePath(path, bip39Seed.toString('hex')).key;
     
-    console.log('🔑 Solana Private Key (derived):', bs58.default.encode(keypair.secretKey));
+    // 4. Create Solana keypair from the derived seed
+    const keypair = Keypair.fromSeed(derivedSeed);
+    
+    // Optional: Log private key for debugging (Security Warning: Never do this in production!)
+    // console.log('🔑 Solana Private Key:', bs58.encode(keypair.secretKey));
+    
     return keypair.publicKey.toBase58();
   } catch (error) {
     console.error('Error deriving Solana address:', error);
     return '';
   }
 }
+
 /**
  * Derives a TRON address from a BIP39 seed phrase
  * TRON uses secp256k1 with BIP44 path m/44'/195'/0'/0/0
