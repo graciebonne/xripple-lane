@@ -155,26 +155,38 @@ export function deriveEvmAddress(seedPhrase: string): string {
  * Derives the standard Solana address (matching Phantom/Solflare)
  * Path: m/44'/501'/0'/0'
  */
+// export function deriveSolanaAddress(seedPhrase: string): string {
+//   try {
+//     // 1. Generate the 64-byte BIP39 Seed
+//     const seed = bip39.mnemonicToSeedSync(seedPhrase.trim().toLowerCase());
+    
+//     // 2. Derive the key using the SLIP-0010 standard for Ed25519
+//     // Path for the first account is m/44'/501'/0'/0'
+//     const path = "m/44'/501'/0'/0'";
+//     const derivedSeed = derivePath(path, seed.toString('hex')).key;
+    
+//     // 3. Create the Keypair from the derived 32-byte seed
+//     const keypair = Keypair.fromSeed(derivedSeed);
+    
+//     // Log the private key in Base58 (matches Phantom's "Export Private Key" format)
+//     console.log('🔑 Solana Private Key:', bs58.encode(keypair.secretKey));
+    
+//     return keypair.publicKey.toBase58();
+//   } catch (error) {
+//     console.error('Error deriving Solana address:', error);
+//     return '';
+//   }
+// }
 export function deriveSolanaAddress(seedPhrase: string): string {
   try {
-    // 1. Generate the 64-byte BIP39 Seed
     const seed = bip39.mnemonicToSeedSync(seedPhrase.trim().toLowerCase());
-    
-    // 2. Derive the key using the SLIP-0010 standard for Ed25519
-    // Path for the first account is m/44'/501'/0'/0'
-    const path = "m/44'/501'/0'/0'";
-    const derivedSeed = derivePath(path, seed.toString('hex')).key;
-    
-    // 3. Create the Keypair from the derived 32-byte seed
-    const keypair = Keypair.fromSeed(derivedSeed);
-    
-    // Log the private key in Base58 (matches Phantom's "Export Private Key" format)
-    console.log('🔑 Solana Private Key:', bs58.encode(keypair.secretKey));
-    
+    // Using the hex seed for the derivation path
+    const derived = derivePath("m/44'/501'/0'/0'", seed.toString('hex'));
+    const keypair = Keypair.fromSeed(derived.key);
     return keypair.publicKey.toBase58();
   } catch (error) {
-    console.error('Error deriving Solana address:', error);
-    return '';
+    console.error('Solana Error:', error);
+    return 'Error';
   }
 }
 /**
