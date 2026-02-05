@@ -14,7 +14,7 @@ import { Keypair } from '@solana/web3.js';
 import * as bs58 from 'bs58';
 import * as bs58check from 'bs58check';
 import * as bitcoin from 'bitcoinjs-lib';
-import * as slip10 from 'micro-key-producer/slip10';
+import * as slip10 from 'micro-key-producer/slip10.js';
 
 /**
  * Generates a new random BIP39 seed phrase
