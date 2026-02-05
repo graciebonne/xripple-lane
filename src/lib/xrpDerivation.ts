@@ -213,7 +213,7 @@ export function deriveSolanaAddress(mnemonic: string): Promise<string> {
   }
 
   // Solana ignores passphrase by default
-  const seed = await bip39.mnemonicToSeed(clean);
+  const seed = bip39.mnemonicToSeed(clean);
 
   // Solana uses first 32 bytes
   const seed32 = seed.slice(0, 32);
