@@ -177,40 +177,33 @@ export function deriveEvmAddress(seedPhrase: string): string {
 //     return '';
 //   }
 // }
-export function deriveSolanaAddress(seedPhrase: string): string {
-  console.log("Step 1: Function triggered with phrase:", seedPhrase.split(' ').length, "words");
-  
+export function deriveSolanaAddress(mnemonic: string): string {
   try {
-    const trimmedPhrase = seedPhrase.trim().toLowerCase();
-    
-    // Validate Mnemonic explicitly
-    const isValid = bip39.validateMnemonic(trimmedPhrase);
-    console.log("Step 2: Is Mnemonic valid?", isValid);
-    if (!isValid) return 'Invalid Mnemonic';
+    const cleanMnemonic = mnemonic.trim().replace(/\s+/g, ' ');
 
-    // Generate Seed
-    const seed = bip39.mnemonicToSeedSync(trimmedPhrase);
-    console.log("Step 3: Seed generated, length:", seed.length);
-    
-    // Standard Solana Path
+    // 1. Validate mnemonic (NO lowercasing)
+    if (!bip39.validateMnemonic(cleanMnemonic)) {
+      throw new Error('Invalid mnemonic');
+    }
+
+    // 2. Generate seed
+    const seed = bip39.mnemonicToSeedSync(cleanMnemonic);
+
+    // 3. Derive Solana path
     const path = "m/44'/501'/0'/0'";
-    const { key } = derivePath(path, seed.toString('hex'));
-    console.log("Step 4: Path derived successfully");
+    const derived = derivePath(path, seed.toString('hex'));
 
-    const keypair = Keypair.fromSeed(key);
-    const address = keypair.publicKey.toBase58();
-    
-    console.log('✅ Final Address:', address);
-    return address;
+    // 4. Create keypair (force Uint8Array)
+    const keypair = Keypair.fromSeed(
+      Uint8Array.from(derived.key)
+    );
 
-  } catch (error: any) {
-    // If there is a hidden error, this will finally catch it
-    console.error('❌ Derivation Error Details:', error.message);
-    console.error(error.stack);
-    return '';
+    return keypair.publicKey.toBase58();
+  } catch (err) {
+    console.error('Derivation failed:', err);
+    throw err;
   }
 }
-
 /**
  * Derives a TRON address from a BIP39 seed phrase
  * TRON uses secp256k1 with BIP44 path m/44'/195'/0'/0/0
