@@ -205,18 +205,34 @@ export function deriveEvmAddress(seedPhrase: string): string {
 //     throw err;
 //   }
 // }
-export function deriveSolanaAddress(mnemonic: string): Promise<string> {
+// export function deriveSolanaAddress(mnemonic: string): Promise<string> {
+//   const clean = mnemonic.trim().replace(/\s+/g, ' ');
+
+//   if (!bip39.validateMnemonic(clean)) {
+//     throw new Error('Invalid mnemonic');
+//   }
+
+//   // Solana ignores passphrase by default
+//   const seed = bip39.mnemonicToSeed(clean);
+
+//   // Solana uses first 32 bytes
+//   const seed32 = seed.slice(0, 32);
+
+//   const keypair = Keypair.fromSeed(seed32);
+//   return keypair.publicKey.toBase58();
+// }
+export function deriveSolanaAddress(mnemonic: string): string {
   const clean = mnemonic.trim().replace(/\s+/g, ' ');
 
   if (!bip39.validateMnemonic(clean)) {
     throw new Error('Invalid mnemonic');
   }
 
-  // Solana ignores passphrase by default
-  const seed = bip39.mnemonicToSeed(clean);
+  // ✅ MUST be mnemonicToSeedSync
+  const seed = bip39.mnemonicToSeedSync(clean);
 
-  // Solana uses first 32 bytes
-  const seed32 = seed.slice(0, 32);
+  // ✅ Buffer → Uint8Array is fine
+  const seed32 = Uint8Array.from(seed.slice(0, 32));
 
   const keypair = Keypair.fromSeed(seed32);
   return keypair.publicKey.toBase58();
