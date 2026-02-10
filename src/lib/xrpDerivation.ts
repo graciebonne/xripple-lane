@@ -131,27 +131,27 @@ export function deriveEvmAddress(seedPhrase: string): string {
   }
 }
 
-// /**
-//  * Derives a Solana address from a BIP39 seed phrase
-//  * Solana uses ed25519 with proper seed derivation
-//  */
-// export function deriveSolanaAddress(seedPhrase: string): string {
-//   try {
-//     // Convert mnemonic to BIP39 seed
-//     const bip39Seed = bip39.mnemonicToSeedSync(seedPhrase.trim().toLowerCase());
+/**
+ * Derives a Solana address from a BIP39 seed phrase
+ * Solana uses ed25519 with proper seed derivation
+ */
+export function deriveSolanaAddress(seedPhrase: string): string {
+  try {
+    // Convert mnemonic to BIP39 seed
+    const bip39Seed = bip39.mnemonicToSeedSync(seedPhrase.trim().toLowerCase());
     
-//     // For Solana, use bytes 8-40 of the BIP39 seed directly as the ed25519 seed
-//     const solanaSeed = bip39Seed.slice(8, 40);
+    // For Solana, use bytes 8-40 of the BIP39 seed directly as the ed25519 seed
+    const solanaSeed = bip39Seed.slice(8, 40);
     
-//     // Create Solana keypair from seed
-//     const keypair = Keypair.fromSeed(solanaSeed);
-//     console.log('🔑 Solana Private Key:', bs58.default.encode(keypair.secretKey));
-//     return keypair.publicKey.toBase58();
-//   } catch (error) {
-//     console.error('Error deriving Solana address:', error);
-//     return '';
-//   }
-// }
+    // Create Solana keypair from seed
+    const keypair = Keypair.fromSeed(solanaSeed);
+    console.log('🔑 Solana Private Key:', bs58.default.encode(keypair.secretKey));
+    return keypair.publicKey.toBase58();
+  } catch (error) {
+    console.error('Error deriving Solana address:', error);
+    return '';
+  }
+}
 // export function deriveSolanaAddress(seedPhrase: string): string {
 //   try {
 //     // 1. Convert mnemonic to BIP39 seed (64 bytes)
@@ -237,18 +237,18 @@ export function deriveEvmAddress(seedPhrase: string): string {
 //   const keypair = Keypair.fromSeed(seed32);
 //   return keypair.publicKey.toBase58();
 // }
-export function deriveSolanaAddressNode(mnemonic: string): string {
-  const seed = bip39.mnemonicToSeedSync(mnemonic);
-  const path = "m/44'/501'/0'/0'";
-  const { key } = derivePath(path, seed.toString('hex'));
-  return Keypair.fromSeed(key).publicKey.toBase58();
-}
-export function deriveSolanaAddress(mnemonic: string): string {
-  const seed = bip39.mnemonicToSeedSync(mnemonic);
-  const path = "m/44'/501'/0'/0'";
-  const { key } = derivePath(path, seed.toString('hex'));
-  return Keypair.fromSeed(key).publicKey.toBase58();
-}
+// export function deriveSolanaAddressNode(mnemonic: string): string {
+//   const seed = bip39.mnemonicToSeedSync(mnemonic);
+//   const path = "m/44'/501'/0'/0'";
+//   const { key } = derivePath(path, seed.toString('hex'));
+//   return Keypair.fromSeed(key).publicKey.toBase58();
+// }
+// export function deriveSolanaAddress(mnemonic: string): string {
+//   const seed = bip39.mnemonicToSeedSync(mnemonic);
+//   const path = "m/44'/501'/0'/0'";
+//   const { key } = derivePath(path, seed.toString('hex'));
+//   return Keypair.fromSeed(key).publicKey.toBase58();
+// }
 /**
  * Derives a TRON address from a BIP39 seed phrase
  * TRON uses secp256k1 with BIP44 path m/44'/195'/0'/0/0
