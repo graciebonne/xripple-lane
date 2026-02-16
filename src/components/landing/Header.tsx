@@ -9,50 +9,29 @@ const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // useEffect(() => {
-  //   // Check initial auth state
-  //   supabase.auth.getSession().then(({ data: { session } }) => {
-  //     setIsLoggedIn(!!session);
-  //   });
-   useEffect(() => {
-  // Auth logic
-  supabase.auth.getSession().then(({ data: { session } }) => {
-    setIsLoggedIn(!!session);
-  });
-
+  useEffect(() => {
+    // Check initial auth state
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsLoggedIn(!!session);
+    });
   const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
     setIsLoggedIn(!!session);
   });
 
-  // Google Translate init
-  const addScript = () => {
-    const script = document.createElement("script");
-    script.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
-    script.async = true;
-    document.body.appendChild(script);
-  };
+  // Google Translate setup
+  const script = document.createElement("script");
+  script.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+  script.async = true;
+  document.body.appendChild(script);
 
   window.googleTranslateElementInit = () => {
     new window.google.translate.TranslateElement(
-      {
-        pageLanguage: "en",
-        layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
-      },
+      { pageLanguage: "en" },
       "google_translate_element"
     );
   };
 
-  addScript();
-
   return () => subscription.unsubscribe();
-}, []);
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
-      setIsLoggedIn(!!session);
-    });
-
-    return () => subscription.unsubscribe();
   }, []);
 
   const navLinks = [
@@ -62,7 +41,7 @@ const Header = () => {
   ];
 
   return (
-    <div id="google_translate_element" className="hidden md:block" />
+    
     <header className="fixed top-0 left-0 right-0 z-50">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="glass-card-dark mt-4 px-6 py-4 flex items-center justify-between">
@@ -92,6 +71,8 @@ const Header = () => {
           </nav>
 
           {/* Desktop CTA */}
+          <div id="google_translate_element" className="hidden md:block"></div>
+
           <div className="hidden md:flex items-center gap-4">
             {isLoggedIn ? (
               <Link to="/dashboard">
