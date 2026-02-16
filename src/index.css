@@ -317,3 +317,94 @@
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--muted-foreground) / 0.5);
 }
+/* ===== GOOGLE TRANSLATE CLEANUP ===== */
+
+/* Hide Google logo */
+.goog-logo-link {
+  display: none !important;
+}
+
+/* Hide "Powered by Google" text */
+.goog-te-gadget span {
+  display: none !important;
+}
+
+/* Remove extra spacing */
+.goog-te-gadget {
+  font-size: 0 !important;
+}
+
+/* Hide top banner iframe */
+.goog-te-banner-frame.skiptranslate {
+  display: none !important;
+}
+
+/* Prevent page from shifting down */
+body {
+  top: 0px !important;
+}
+
+/* Hide tooltip */
+.goog-tooltip {
+  display: none !important;
+}
+
+.goog-tooltip:hover {
+  display: none !important;
+}
+
+/* Hide highlight */
+.goog-text-highlight {
+  background: none !important;
+  box-shadow: none !important;
+}
+
+/* Hide translate popup */
+#goog-gt-tt,
+.goog-te-balloon-frame {
+  display: none !important;
+}
+
+/* ===== DROPDOWN STYLING ===== */
+
+#google_translate_element {
+  display: flex;
+  align-items: center;
+}
+
+#google_translate_element select {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#google_translate_element select:hover {
+  border-color: rgba(255, 255, 255, 0.35);
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+#google_translate_element select option {
+  color: black;
+}
+
+/* Hide Google icon inside widget */
+.goog-te-gadget-icon {
+  display: none !important;
+}
+
+/* Remove iframe border */
+iframe.goog-te-menu-frame {
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* Extra safety */
+.skiptranslate {
+  display: none !important;
+}
