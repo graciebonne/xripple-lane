@@ -110,7 +110,7 @@ const Header = () => {
           </div>
 
           {/* Mobile Menu Button */}
-          <div id="google_translate_element_mobile" className="mt-4" />
+        
 
           <button
             className="md:hidden text-white p-2"
@@ -140,6 +140,7 @@ const Header = () => {
                     {link.name}
                   </a>
                 ))}
+                  <div id="google_translate_element_mobile" className="mt-4" />
                 <div className="border-t border-white/10 pt-4 mt-2 flex flex-col gap-3">
                   {isLoggedIn ? (
                     <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)}>
