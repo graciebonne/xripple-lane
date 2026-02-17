@@ -400,3 +400,6 @@ box-shadow: none !important;
 .skiptranslate > iframe{
     display: none;
 }
+.asdinf{
+  overflow:auto;
+}
