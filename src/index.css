@@ -317,52 +317,56 @@
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--muted-foreground) / 0.5);
 }
-/* Hide Google logo only */
+/* Hide Google branding */
 .goog-logo-link {
   display: none !important;
 }
 
-/* Hide "Powered by Google" text but keep dropdown */
-.goog-te-gadget span:not(.goog-te-combo) {
-  display: none !important;
-}
-
-/* Hide top banner */
 .goog-te-banner-frame.skiptranslate {
   display: none !important;
 }
 
-/* Prevent page shift */
 body {
   top: 0 !important;
 }
 
-/* Remove tooltip + highlights */
-.goog-tooltip,
-.goog-text-highlight,
-#goog-gt-tt {
-  display: none !important;
+/* Container */
+#google_translate_element,
+#google_translate_element_mobile {
+  display: flex;
+  align-items: center;
 }
 
-/* Clean dropdown styling */
-#google_translate_element select.goog-te-combo {
-  background-color: rgba(255,255,255,0.08);
-  color: white;
-  border: 1px solid rgba(255,255,255,0.2);
-  padding: 6px 10px;
-  border-radius: 8px;
-  font-size: 14px;
-  outline: none;
-  cursor: pointer;
+/* Dropdown button */
+.goog-te-combo {
+  background: rgba(20, 20, 20, 0.9) !important;
+  color: #fff !important;
+  border: 1px solid rgba(255,255,255,0.2) !important;
+  padding: 6px 10px !important;
+  border-radius: 8px !important;
+  font-size: 14px !important;
 }
 
-/* Optional hover */
-#google_translate_element select.goog-te-combo:hover {
-  border-color: rgba(255,255,255,0.4);
+/* Dropdown list (fix white text issue) */
+.goog-te-menu2 {
+  background: #111 !important;
 }
 
-/* Remove iframe shadow */
-iframe.goog-te-menu-frame {
-  box-shadow: none !important;
-  border: none !important;
+.goog-te-menu2-item div,
+.goog-te-menu2-item span {
+  color: #000 !important;
+}
+
+/* Fix hover readability */
+.goog-te-menu2-item:hover {
+  background: #eee !important;
+}
+
+/* Mobile spacing */
+#google_translate_element_mobile {
+  width: 100%;
+}
+
+#google_translate_element_mobile select {
+  width: 100% !important;
 }
