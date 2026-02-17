@@ -41,21 +41,17 @@ const Header = () => {
 //     "google_translate_element_mobile"
 //   );
 // };
-    const addScript = () => {
-    const script = document.createElement("script");
-    script.src =
-      "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
-    script.async = true;
-    document.body.appendChild(script);
-  };
+const initTranslate = () => {
+    if (!window.google || !window.google.translate) return;
 
-  window.googleTranslateElementInit = () => {
-    if (window.google) {
+    if (document.getElementById("google_translate_element")) {
       new window.google.translate.TranslateElement(
         { pageLanguage: "en" },
         "google_translate_element"
       );
+    }
 
+    if (document.getElementById("google_translate_element_mobile")) {
       new window.google.translate.TranslateElement(
         { pageLanguage: "en" },
         "google_translate_element_mobile"
@@ -63,10 +59,20 @@ const Header = () => {
     }
   };
 
-  addScript();
+  if (!window.googleTranslateElementInit) {
+    window.googleTranslateElementInit = initTranslate;
+
+    const script = document.createElement("script");
+    script.src =
+      "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+    script.async = true;
+    document.body.appendChild(script);
+  } else {
+    initTranslate();
+  }
 
   return () => subscription.unsubscribe();
-  }, []);
+  }, [mobileMenuOpen]);
 
   const navLinks = [
     { name: "Features", href: "#features" },
