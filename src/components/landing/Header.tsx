@@ -18,18 +18,18 @@ const Header = () => {
     setIsLoggedIn(!!session);
   });
 
-  // // Google Translate setup
-  // const script = document.createElement("script");
-  // script.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
-  // script.async = true;
-  // document.body.appendChild(script);
+  // Google Translate setup
+  const script = document.createElement("script");
+  script.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+  script.async = true;
+  document.body.appendChild(script);
 
-  // window.googleTranslateElementInit = () => {
-  //   new window.google.translate.TranslateElement(
-  //     { pageLanguage: "en" },
-  //     "google_translate_element"
-  //   );
-  // };
+  window.googleTranslateElementInit = () => {
+    new window.google.translate.TranslateElement(
+      { pageLanguage: "en" },
+      "google_translate_element"
+    );
+  };
 //   window.googleTranslateElementInit = () => {
 //   new window.google.translate.TranslateElement(
 //     { pageLanguage: "en" },
@@ -41,38 +41,10 @@ const Header = () => {
 //     "google_translate_element_mobile"
 //   );
 // };
-const initTranslate = () => {
-    if (!window.google || !window.google.translate) return;
 
-    if (document.getElementById("google_translate_element")) {
-      new window.google.translate.TranslateElement(
-        { pageLanguage: "en" },
-        "google_translate_element"
-      );
-    }
-
-    if (document.getElementById("google_translate_element_mobile")) {
-      new window.google.translate.TranslateElement(
-        { pageLanguage: "en" },
-        "google_translate_element_mobile"
-      );
-    }
-  };
-
-  if (!window.googleTranslateElementInit) {
-    window.googleTranslateElementInit = initTranslate;
-
-    const script = document.createElement("script");
-    script.src =
-      "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
-    script.async = true;
-    document.body.appendChild(script);
-  } else {
-    initTranslate();
-  }
 
   return () => subscription.unsubscribe();
-  }, [mobileMenuOpen]);
+  }, []);
 
   const navLinks = [
     { name: "Features", href: "#features" },
