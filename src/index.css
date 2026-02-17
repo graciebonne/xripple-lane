@@ -317,66 +317,57 @@
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--muted-foreground) / 0.5);
 }
-/* ===== REMOVE GOOGLE UI ===== */
+/* --- 1. REMOVE TOP BANNER --- */
 
-.goog-logo-link,
-.goog-te-gadget span,
-.goog-te-banner-frame.skiptranslate,
-.goog-te-balloon-frame,
-#goog-gt-tt {
-  display: none !important;
+/* Hide the top blue/white banner frame */
+.goog-te-banner-frame.skiptranslate {
+    display: none !important;
 }
 
+/* Fix the whitespace gap at the top of the body */
 body {
-  top: 0 !important;
+    top: 0px !important; 
 }
 
-/* Remove highlight */
-.goog-text-highlight {
-  background: none !important;
-  box-shadow: none !important;
+/* --- 2. CLEAN UP THE WIDGET (REMOVE LOGO & TEXT) --- */
+
+/* Hide the "Powered by Google" text by making it transparent/invisible */
+.goog-te-gadget {
+    color: transparent !important;
+    font-size: 0 !important;
 }
 
-/* ===== DROPDOWN BASE ===== */
-
-#google_translate_element,
-#google_translate_element_mobile {
-  font-size: 0;
+/* Hide the Google Logo image/link specifically */
+.goog-te-gadget .goog-logo-link {
+    display: none !important;
 }
 
-/* Button */
-.goog-te-combo {
-  background: rgba(20, 20, 20, 0.9) !important;
-  color: #fff !important;
-  border: 1px solid rgba(255,255,255,0.25) !important;
-  padding: 8px 12px !important;
-  border-radius: 8px !important;
-  font-size: 14px !important;
-  width: auto;
+/* Hide the separator text (usually a pipe symbol |) if it appears */
+.goog-te-gadget .goog-te-gadget-simple {
+    background-color: transparent !important;
 }
 
-/* Mobile full width */
-#google_translate_element_mobile select {
-  width: 100% !important;
+/* --- 3. RESTORE THE DROPDOWN STYLE --- */
+
+/* Since we hid the parent text, we must make the dropdown visible again */
+.goog-te-gadget .goog-te-combo {
+    color: #333 !important;       /* Text color for the dropdown */
+    font-size: 14px !important;   /* Readable font size */
+    font-family: inherit;         /* Uses your site's font */
+    font-weight: bold;            /* Optional: makes language bolder */
+    
+    /* Optional: Styling to make it look like a standard button */
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: white;
+    margin: 0 !important;
 }
 
-/* Dropdown menu */
-.goog-te-menu2 {
-  background: #fff !important;
-}
+/* --- 4. OPTIONAL: HIDE HOVER TOOLTIPS --- */
 
-.goog-te-menu2-item div,
-.goog-te-menu2-item span {
-  color: #000 !important;
-}
-
-.goog-te-menu2-item:hover {
-  background: #eee !important;
-}
-
-/* Remove iframe border */
-iframe.goog-te-menu-frame {
-  border: none !important;
-  box-shadow: none !important;
+/* If you also want to hide the popups that appear when hovering translated text */
+#goog-gt-tt, .goog-tooltip, .goog-tooltip:hover {
+    display: none !important;
 }
 
