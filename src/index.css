@@ -396,6 +396,9 @@ box-shadow: none !important;
         .asdfg{
     display:none;
 }
+      .buildi{
+        width:60px;                                                                                                                                                                           
+      }
 }
 .skiptranslate > iframe{
     display: none;
