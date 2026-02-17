@@ -397,6 +397,6 @@ box-shadow: none !important;
     display:none;
 }
 }
-.skiptranslate{
+.skiptranslate > iframe{
     display: none;
 }
