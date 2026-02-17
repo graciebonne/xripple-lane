@@ -47,7 +47,18 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
       setUser(session?.user ?? null);
       if (!session) navigate("/login");
     });
+     // Google Translate setup
+  const script = document.createElement("script");
+  script.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+  script.async = true;
+  document.body.appendChild(script);
 
+  window.googleTranslateElementInit = () => {
+    new window.google.translate.TranslateElement(
+      { pageLanguage: "en" },
+      "google_translate_element"
+    );
+  };
     return () => subscription.unsubscribe();
   }, [navigate]);
 
@@ -93,6 +104,8 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
             <LogOut className="w-5 h-5" />
             Logout
           </button>
+          <div id="google_translate_element" className=" md:flex"></div>
+
         </div>
       </aside>
 
