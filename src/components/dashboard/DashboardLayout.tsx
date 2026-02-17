@@ -97,7 +97,7 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
                 {item.name}
               </Link>
             ))}
-             <div id="google_translate_element" className=" md:flex"></div>
+             <div id="google_translate_element" className=" md:flex"/>
           </nav>
 
           {/* Logout */}
