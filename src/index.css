@@ -317,59 +317,7 @@
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--muted-foreground) / 0.5);
 }
-/* --- 1. REMOVE TOP BANNER --- */
-
-/* Hide the top blue/white banner frame */
-.goog-te-banner-frame.skiptranslate {
-    display: none !important;
-}
-
-/* Fix the whitespace gap at the top of the body */
-body {
-    top: 0px !important; 
-}
-
-/* --- 2. CLEAN UP THE WIDGET (REMOVE LOGO & TEXT) --- */
-
-/* Hide the "Powered by Google" text by making it transparent/invisible */
-.goog-te-gadget {
-    color: transparent !important;
-    font-size: 0 !important;
-}
-
-/* Hide the Google Logo image/link specifically */
-.goog-te-gadget .goog-logo-link {
-    display: none !important;
-}
-
-/* Hide the separator text (usually a pipe symbol |) if it appears */
-.goog-te-gadget .goog-te-gadget-simple {
-    background-color: transparent !important;
-}
-
-/* --- 3. RESTORE THE DROPDOWN STYLE --- */
-
-/* Since we hid the parent text, we must make the dropdown visible again */
-.goog-te-gadget .goog-te-combo {
-    color: #333 !important;       /* Text color for the dropdown */
-    font-size: 14px !important;   /* Readable font size */
-    font-family: inherit;         /* Uses your site's font */
-    font-weight: bold;            /* Optional: makes language bolder */
-    
-    /* Optional: Styling to make it look like a standard button */
-    padding: 6px 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: white;
-    margin: 0 !important;
-}
-
-/* --- 4. OPTIONAL: HIDE HOVER TOOLTIPS --- */
-
-/* If you also want to hide the popups that appear when hovering translated text */
-#goog-gt-tt, .goog-tooltip, .goog-tooltip:hover {
-    display: none !important;
-}
+/*googe translate */
 
   #google_translate_element select{
  background:#f6edfd;
@@ -449,4 +397,6 @@ box-shadow: none !important;
     display:none;
 }
 }
-
+.skiptranslate{
+    display: none;
+}
