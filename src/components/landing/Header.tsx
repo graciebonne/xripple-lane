@@ -82,7 +82,7 @@ const Header = () => {
           </nav>
 
           {/* Desktop CTA */}
-          <div id="google_translate_element" className="hidden md:block"></div>
+          <div id="google_translate_element" className="rounded-lg border border-white/10 bg-white/5 p-2 hidden md:block"></div>
 
           <div className="hidden md:flex items-center gap-4">
             {isLoggedIn ? (
