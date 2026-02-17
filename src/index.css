@@ -317,12 +317,13 @@
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--muted-foreground) / 0.5);
 }
-/* Hide Google branding */
-.goog-logo-link {
-  display: none !important;
-}
+/* ===== REMOVE GOOGLE UI ===== */
 
-.goog-te-banner-frame.skiptranslate {
+.goog-logo-link,
+.goog-te-gadget span,
+.goog-te-banner-frame.skiptranslate,
+.goog-te-balloon-frame,
+#goog-gt-tt {
   display: none !important;
 }
 
@@ -330,26 +331,38 @@ body {
   top: 0 !important;
 }
 
-/* Container */
-#google_translate_element,
-#google_translate_element_mobile {
-  display: flex;
-  align-items: center;
+/* Remove highlight */
+.goog-text-highlight {
+  background: none !important;
+  box-shadow: none !important;
 }
 
-/* Dropdown button */
+/* ===== DROPDOWN BASE ===== */
+
+#google_translate_element,
+#google_translate_element_mobile {
+  font-size: 0;
+}
+
+/* Button */
 .goog-te-combo {
   background: rgba(20, 20, 20, 0.9) !important;
   color: #fff !important;
-  border: 1px solid rgba(255,255,255,0.2) !important;
-  padding: 6px 10px !important;
+  border: 1px solid rgba(255,255,255,0.25) !important;
+  padding: 8px 12px !important;
   border-radius: 8px !important;
   font-size: 14px !important;
+  width: auto;
 }
 
-/* Dropdown list (fix white text issue) */
+/* Mobile full width */
+#google_translate_element_mobile select {
+  width: 100% !important;
+}
+
+/* Dropdown menu */
 .goog-te-menu2 {
-  background: #111 !important;
+  background: #fff !important;
 }
 
 .goog-te-menu2-item div,
@@ -357,16 +370,13 @@ body {
   color: #000 !important;
 }
 
-/* Fix hover readability */
 .goog-te-menu2-item:hover {
   background: #eee !important;
 }
 
-/* Mobile spacing */
-#google_translate_element_mobile {
-  width: 100%;
+/* Remove iframe border */
+iframe.goog-te-menu-frame {
+  border: none !important;
+  box-shadow: none !important;
 }
 
-#google_translate_element_mobile select {
-  width: 100% !important;
-}
