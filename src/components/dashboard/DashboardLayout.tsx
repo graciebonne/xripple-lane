@@ -97,6 +97,7 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
                 {item.name}
               </Link>
             ))}
+             <div id="google_translate_element" className=" md:flex"></div>
           </nav>
 
           {/* Logout */}
@@ -104,7 +105,7 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
             <LogOut className="w-5 h-5" />
             Logout
           </button>
-          <div id="google_translate_element" className=" md:flex"></div>
+         
 
         </div>
       </aside>
