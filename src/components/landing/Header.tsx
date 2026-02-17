@@ -173,10 +173,7 @@ const initTranslate = () => {
                     {link.name}
                   </a>
                 ))}
-                               <div
-                  id="google_translate_element_mobile"
-                  className="md:hidden w-full"
-                />
+                              
 
                 <div className="border-t border-white/10 pt-4 mt-2 flex flex-col gap-3">
                   {isLoggedIn ? (
@@ -187,6 +184,10 @@ const initTranslate = () => {
                     </Link>
                   ) : (
                     <>
+                       <div
+                  id="google_translate_element_mobile"
+                  className="md:hidden w-full"
+                />
                       <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
                         <Button variant="ghost" className="w-full text-white hover:text-primary hover:bg-white/5">
                           Sign In
