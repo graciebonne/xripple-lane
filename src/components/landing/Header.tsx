@@ -18,11 +18,11 @@ const Header = () => {
     setIsLoggedIn(!!session);
   });
 
-  // Google Translate setup
-  const script = document.createElement("script");
-  script.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
-  script.async = true;
-  document.body.appendChild(script);
+  // // Google Translate setup
+  // const script = document.createElement("script");
+  // script.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+  // script.async = true;
+  // document.body.appendChild(script);
 
   // window.googleTranslateElementInit = () => {
   //   new window.google.translate.TranslateElement(
@@ -30,17 +30,40 @@ const Header = () => {
   //     "google_translate_element"
   //   );
   // };
-  window.googleTranslateElementInit = () => {
-  new window.google.translate.TranslateElement(
-    { pageLanguage: "en" },
-    "google_translate_element"
-  );
+//   window.googleTranslateElementInit = () => {
+//   new window.google.translate.TranslateElement(
+//     { pageLanguage: "en" },
+//     "google_translate_element"
+//   );
 
-  new window.google.translate.TranslateElement(
-    { pageLanguage: "en" },
-    "google_translate_element_mobile"
-  );
-};
+//   new window.google.translate.TranslateElement(
+//     { pageLanguage: "en" },
+//     "google_translate_element_mobile"
+//   );
+// };
+    const addScript = () => {
+    const script = document.createElement("script");
+    script.src =
+      "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+    script.async = true;
+    document.body.appendChild(script);
+  };
+
+  window.googleTranslateElementInit = () => {
+    if (window.google) {
+      new window.google.translate.TranslateElement(
+        { pageLanguage: "en" },
+        "google_translate_element"
+      );
+
+      new window.google.translate.TranslateElement(
+        { pageLanguage: "en" },
+        "google_translate_element_mobile"
+      );
+    }
+  };
+
+  addScript();
 
   return () => subscription.unsubscribe();
   }, []);
@@ -82,7 +105,11 @@ const Header = () => {
           </nav>
 
           {/* Desktop CTA */}
-          <div id="google_translate_element" className="rounded-lg border border-white/10 bg-white/5 p-2 hidden md:block"></div>
+         <div
+  id="google_translate_element"
+  className="hidden md:flex items-center"
+/>
+
 
           <div className="hidden md:flex items-center gap-4">
             {isLoggedIn ? (
@@ -140,7 +167,11 @@ const Header = () => {
                     {link.name}
                   </a>
                 ))}
-                  <div id="google_translate_element_mobile" className="mt-4" />
+                               <div
+                  id="google_translate_element_mobile"
+                  className="md:hidden w-full"
+                />
+
                 <div className="border-t border-white/10 pt-4 mt-2 flex flex-col gap-3">
                   {isLoggedIn ? (
                     <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)}>
