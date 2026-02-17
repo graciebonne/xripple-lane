@@ -85,7 +85,7 @@ const Header = () => {
           {/* Desktop CTA */}
          <div
   id="google_translate_element"
-  className="md:flex items-center buldi"
+  className="md:flex items-center buildi"
 />
 
 
