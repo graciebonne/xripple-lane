@@ -85,7 +85,7 @@ const Header = () => {
           {/* Desktop CTA */}
          <div
   id="google_translate_element"
-  className="md:flex items-center"
+  className="md:flex items-center buldi"
 />
 
 
@@ -156,10 +156,8 @@ const Header = () => {
                     </Link>
                   ) : (
                     <>
-                       <div
-                  id="google_translate_element_mobile"
-                  className="md:hidden w-full"
-                />
+                    
+                      
                       <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
                         <Button variant="ghost" className="w-full text-white hover:text-primary hover:bg-white/5">
                           Sign In
