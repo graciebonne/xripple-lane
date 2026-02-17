@@ -24,12 +24,23 @@ const Header = () => {
   script.async = true;
   document.body.appendChild(script);
 
+  // window.googleTranslateElementInit = () => {
+  //   new window.google.translate.TranslateElement(
+  //     { pageLanguage: "en" },
+  //     "google_translate_element"
+  //   );
+  // };
   window.googleTranslateElementInit = () => {
-    new window.google.translate.TranslateElement(
-      { pageLanguage: "en" },
-      "google_translate_element"
-    );
-  };
+  new window.google.translate.TranslateElement(
+    { pageLanguage: "en" },
+    "google_translate_element"
+  );
+
+  new window.google.translate.TranslateElement(
+    { pageLanguage: "en" },
+    "google_translate_element_mobile"
+  );
+};
 
   return () => subscription.unsubscribe();
   }, []);
@@ -99,6 +110,8 @@ const Header = () => {
           </div>
 
           {/* Mobile Menu Button */}
+          <div id="google_translate_element_mobile" className="mt-4" />
+
           <button
             className="md:hidden text-white p-2"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
