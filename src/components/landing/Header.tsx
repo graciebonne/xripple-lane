@@ -30,6 +30,31 @@ const Header = () => {
       "google_translate_element"
     );
   };
+ function abbreviateLanguages() {
+    const select = document.querySelector('.goog-te-combo');
+    if (select && select.options.length > 1) {
+        for (let i = 0; i < select.options.length; i++) {
+            const option = select.options[i];
+            
+            // The 'value' of the option is already the short code (e.g., 'es')
+            if (option.value && option.value !== "") {
+                option.textContent = option.value.toUpperCase();
+            } else if (option.text.includes("Select")) {
+                // Shorten the initial "Select Language" text
+                option.textContent = "LANG";
+            }
+        }
+    }
+}
+
+// Run the function every 500ms to catch the widget when it finishes loading
+const translateInterval = setInterval(() => {
+    const select = document.querySelector('.goog-te-combo');
+    if (select) {
+        abbreviateLanguages();
+        // We don't clear the interval because Google sometimes re-renders the element
+    }
+}, 500);   
 //   window.googleTranslateElementInit = () => {
 //   new window.google.translate.TranslateElement(
 //     { pageLanguage: "en" },
