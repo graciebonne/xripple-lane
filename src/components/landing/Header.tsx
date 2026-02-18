@@ -41,7 +41,7 @@ const Header = () => {
                 option.textContent = option.value.toUpperCase();
             } else if (option.text.includes("Select")) {
                 // Shorten the initial "Select Language" text
-                option.textContent = "LANG";
+                option.textContent = "EN";
             }
         }
     }
