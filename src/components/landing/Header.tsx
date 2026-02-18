@@ -46,7 +46,7 @@ const Header = () => {
         }
     }
 }
-
+ 
 // Run the function every 500ms to catch the widget when it finishes loading
 const translateInterval = setInterval(() => {
     const select = document.querySelector('.goog-te-combo');
