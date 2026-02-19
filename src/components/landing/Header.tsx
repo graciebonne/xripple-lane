@@ -54,7 +54,7 @@ const translateInterval = setInterval(() => {
         abbreviateLanguages();
         // We don't clear the interval because Google sometimes re-renders the element
     }
-}, 500);   
+}, 5000);   
 //   window.googleTranslateElementInit = () => {
 //   new window.google.translate.TranslateElement(
 //     { pageLanguage: "en" },
