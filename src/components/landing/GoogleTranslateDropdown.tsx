@@ -80,7 +80,7 @@ const GoogleTranslateDropdown: React.FC = () => {
   };
 
   return (
-    <div style={{ width: "200px" }}>
+    <div style={{ width: "50px" }}>
       {/* Dropdown showing all languages */}
       <select
         ref={selectRef}
