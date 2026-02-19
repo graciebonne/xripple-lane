@@ -201,7 +201,7 @@ const LANGUAGES = [
   { code: "zu", label: "ZU" },
 ];
 
-export default function GoogleTranslateFullSwitcher() {
+function GoogleTranslateFullSwitcher() {
   useEffect(() => {
     // Load Google Translate script
     if (!document.querySelector("#google-translate")) {
