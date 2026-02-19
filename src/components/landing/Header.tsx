@@ -30,40 +30,78 @@ const Header = () => {
       "google_translate_element"
     );
   };
- function abbreviateLanguages() {
-    const select = document.querySelector('.goog-te-combo');
-    if (select && select.options.length > 1) {
-        for (let i = 0; i < select.options.length; i++) {
-            const option = select.options[i];
+//  function abbreviateLanguages() {
+//     const select = document.querySelector('.goog-te-combo');
+//     if (select && select.options.length > 1) {
+//         for (let i = 0; i < select.options.length; i++) {
+//             const option = select.options[i];
             
-            // The 'value' of the option is already the short code (e.g., 'es')
-            if (option.value && option.value !== "") {
-                option.textContent = option.value.toUpperCase();
-            } else if (option.text.includes("Select")) {
-                // Shorten the initial "Select Language" text
-                option.textContent = "EN";
-            }
-        }
-    }
-}
+//             // The 'value' of the option is already the short code (e.g., 'es')
+//             if (option.value && option.value !== "") {
+//                 option.textContent = option.value.toUpperCase();
+//             } else if (option.text.includes("Select")) {
+//                 // Shorten the initial "Select Language" text
+//                 option.textContent = "EN";
+//             }
+//         }
+//     }
+// }
  
-//Run the function every 500ms to catch the widget when it finishes loading
+// //Run the function every 500ms to catch the widget when it finishes loading
 // const translateInterval = setInterval(() => {
 //     const select = document.querySelector('.goog-te-combo');
 //     if (select) {
 //         abbreviateLanguages();
 //         // We don't clear the interval because Google sometimes re-renders the element
 //     }
-// }, 20000); 
-  const translateInterval = setInterval(() => {
+// }, 500); 
+function updateSelectedAbbreviation() {
+    const select = document.querySelector('.goog-te-combo');
+    if (!select) return;
+
+    const selectedOption = select.options[select.selectedIndex];
+
+    if (selectedOption) {
+        if (selectedOption.value) {
+            selectedOption.textContent = selectedOption.value.toUpperCase();
+        } else if (selectedOption.text.includes("Select")) {
+            selectedOption.textContent = "EN";
+        }
+    }
+}
+
+function initTranslateWatcher() {
+    const select = document.querySelector('.goog-te-combo');
+    if (!select) return;
+
+    // Update when user changes language
+    select.addEventListener('change', () => {
+        // Small delay because Google updates after change
+        setTimeout(updateSelectedAbbreviation, 100);
+    });
+
+    // Also run once on load
+    updateSelectedAbbreviation();
+}
+
+// Poll until Google widget exists
+const interval = setInterval(() => {
     const select = document.querySelector('.goog-te-combo');
     if (select) {
-        abbreviateLanguages();
-
-        // clear the interval
-        clearInterval(translateInterval);
+        initTranslateWatcher();
+        clearInterval(interval);
     }
 }, 500);
+    
+//   const translateInterval = setInterval(() => {
+//     const select = document.querySelector('.goog-te-combo');
+//     if (select) {
+//         abbreviateLanguages();
+
+//         // clear the interval
+//         clearInterval(translateInterval);
+//     }
+// }, 500);
 
     //  const select = document.querySelector('.goog-te-combo');
     // if (select) {
