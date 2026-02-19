@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import GoogleTranslateDropdown from "@components/landing/GoogleTranslateDropdown";
+import GoogleTranslateDropdown from "./GoogleTranslateDropdown";
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
