@@ -47,19 +47,19 @@ const Header = () => {
     }
 }
  
-// Run the function every 500ms to catch the widget when it finishes loading
-// const translateInterval = setInterval(() => {
-//     const select = document.querySelector('.goog-te-combo');
-//     if (select) {
-//         abbreviateLanguages();
-//         // We don't clear the interval because Google sometimes re-renders the element
-//     }
-// }, 000); 
-     const select = document.querySelector('.goog-te-combo');
+//Run the function every 500ms to catch the widget when it finishes loading
+const translateInterval = setInterval(() => {
+    const select = document.querySelector('.goog-te-combo');
     if (select) {
         abbreviateLanguages();
         // We don't clear the interval because Google sometimes re-renders the element
     }
+}, 20000); 
+    //  const select = document.querySelector('.goog-te-combo');
+    // if (select) {
+    //     abbreviateLanguages();
+    //     // We don't clear the interval because Google sometimes re-renders the element
+    // }
 //   window.googleTranslateElementInit = () => {
 //   new window.google.translate.TranslateElement(
 //     { pageLanguage: "en" },
