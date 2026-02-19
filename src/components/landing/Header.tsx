@@ -55,20 +55,15 @@ const Header = () => {
 //         // We don't clear the interval because Google sometimes re-renders the element
 //     }
 // }, 20000); 
-    function runTranslateCheck() {
+  const translateInterval = setInterval(() => {
     const select = document.querySelector('.goog-te-combo');
     if (select) {
         abbreviateLanguages();
+
+        // clear the interval
+        clearInterval(translateInterval);
     }
-}
-
-// Run immediately when the site loads
-document.addEventListener('DOMContentLoaded', () => {
-    runTranslateCheck();
-
-    // Run again after 1 minute (60000 ms)
-    setTimeout(runTranslateCheck, 60000);
-});
+}, 500);
 
     //  const select = document.querySelector('.goog-te-combo');
     // if (select) {
