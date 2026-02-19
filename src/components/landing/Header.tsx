@@ -234,13 +234,19 @@ const LANGUAGES = [
           {/* Desktop CTA */}
        
       {/* This is where all your buttons will appear */}
-      <div
-        id="custom-translate-switcher"
-        style={{ maxHeight: "300px", overflowY: "scroll", border: "1px solid #ccc", padding: "5px" }}
-      ></div>
+       <div>
+      {/* Select dropdown */}
+      <select onChange={handleChange} defaultValue="en">
+        {LANGUAGES.map((lang) => (
+          <option key={lang.code} value={lang.code}>
+            {lang.label}
+          </option>
+        ))}
+      </select>
 
       {/* Hidden Google Translate element */}
       <div id="google_translate_element" style={{ display: "none" }}></div>
+    </div>
 
           <div className="hidden md:flex items-center gap-4">
             {isLoggedIn ? (
