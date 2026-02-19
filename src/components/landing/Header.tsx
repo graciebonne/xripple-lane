@@ -4,37 +4,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-
+import GoogleTranslateDropdown from "@components/landing/GoogleTranslateDropdown";
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-const LANGUAGES = [
-  { code: "af", label: "AF" }, { code: "sq", label: "SQ" }, { code: "am", label: "AM" },
-  { code: "ar", label: "AR" }, { code: "hy", label: "HY" }, { code: "az", label: "AZ" },
-  { code: "eu", label: "EU" }, { code: "be", label: "BE" }, { code: "bn", label: "BN" },
-  { code: "bs", label: "BS" }, { code: "bg", label: "BG" }, { code: "ca", label: "CA" },
-  { code: "zh-CN", label: "ZH" }, { code: "hr", label: "HR" }, { code: "cs", label: "CS" },
-  { code: "da", label: "DA" }, { code: "nl", label: "NL" }, { code: "en", label: "EN" },
-  { code: "eo", label: "EO" }, { code: "et", label: "ET" }, { code: "fi", label: "FI" },
-  { code: "fr", label: "FR" }, { code: "gl", label: "GL" }, { code: "ka", label: "KA" },
-  { code: "de", label: "DE" }, { code: "el", label: "EL" }, { code: "gu", label: "GU" },
-  { code: "ht", label: "HT" }, { code: "he", label: "HE" }, { code: "hi", label: "HI" },
-  { code: "hu", label: "HU" }, { code: "is", label: "IS" }, { code: "id", label: "ID" },
-  { code: "ga", label: "GA" }, { code: "it", label: "IT" }, { code: "ja", label: "JA" },
-  { code: "kn", label: "KN" }, { code: "kk", label: "KK" }, { code: "ko", label: "KO" },
-  { code: "ky", label: "KY" }, { code: "lo", label: "LO" }, { code: "la", label: "LA" },
-  { code: "lv", label: "LV" }, { code: "lt", label: "LT" }, { code: "mk", label: "MK" },
-  { code: "ms", label: "MS" }, { code: "mt", label: "MT" }, { code: "mn", label: "MN" },
-  { code: "no", label: "NO" }, { code: "fa", label: "FA" }, { code: "pl", label: "PL" },
-  { code: "pt", label: "PT" }, { code: "pa", label: "PA" }, { code: "ro", label: "RO" },
-  { code: "ru", label: "RU" }, { code: "sr", label: "SR" }, { code: "si", label: "SI" },
-  { code: "sk", label: "SK" }, { code: "sl", label: "SL" }, { code: "es", label: "ES" },
-  { code: "sw", label: "SW" }, { code: "sv", label: "SV" }, { code: "ta", label: "TA" },
-  { code: "te", label: "TE" }, { code: "th", label: "TH" }, { code: "tr", label: "TR" },
-  { code: "uk", label: "UK" }, { code: "ur", label: "UR" }, { code: "uz", label: "UZ" },
-  { code: "vi", label: "VI" }, { code: "cy", label: "CY" }, { code: "xh", label: "XH" },
-  { code: "yi", label: "YI" }, { code: "zu", label: "ZU" },
-];
+
 
   useEffect(() => {
     // Check initial auth state
@@ -147,50 +121,6 @@ const LANGUAGES = [
 //   );
 // };
     
-// 1️⃣ Load Google Translate script if not already loaded
-  if (!document.querySelector("#google-translate")) {
-    const script = document.createElement("script");
-    script.id = "google-translate";
-    script.src =
-      "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
-    document.body.appendChild(script);
-
-    // Initialize when script loads
-    window.googleTranslateElementInit = () => {
-      new window.google.translate.TranslateElement(
-        { pageLanguage: "en" },
-        "google_translate_element"
-      );
-    };
-  }
-
-  // 2️⃣ Function to switch language programmatically
-  const switchLanguage = (langCode) => {
-    const select = document.querySelector(".goog-te-combo");
-    if (!select) return;
-
-    select.value = langCode;
-    select.dispatchEvent(new Event("change"));
-
-    // Optional: update the selected option text
-    const selectedOption = select.options[select.selectedIndex];
-    if (selectedOption) {
-      selectedOption.textContent = langCode.toUpperCase();
-    }
-  };
-
-  // 3️⃣ Create a dropdown dynamically inside your effect
-  const container = document.getElementById("custom-translate-switcher");
-  if (container && container.childElementCount === 0) {
-    LANGUAGES.forEach((lang) => {
-      const btn = document.createElement("button");
-      btn.innerText = lang.label;
-      btn.style.margin = "2px";
-      btn.style.padding = "2px 5px";
-      btn.onclick = () => switchLanguage(lang.code);
-      container.appendChild(btn);
-    });
-  }
 
   return () => subscription.unsubscribe();
   }, []);
@@ -233,20 +163,8 @@ const LANGUAGES = [
 
           {/* Desktop CTA */}
        
-      {/* This is where all your buttons will appear */}
-       <div>
-      {/* Select dropdown */}
-      <select onChange={handleChange} defaultValue="en">
-        {LANGUAGES.map((lang) => (
-          <option key={lang.code} value={lang.code}>
-            {lang.label}
-          </option>
-        ))}
-      </select>
-
-      {/* Hidden Google Translate element */}
-      <div id="google_translate_element" style={{ display: "none" }}></div>
-    </div>
+          {/* Google Translate Dropdown */}
+      <GoogleTranslateDropdown />
 
           <div className="hidden md:flex items-center gap-4">
             {isLoggedIn ? (
